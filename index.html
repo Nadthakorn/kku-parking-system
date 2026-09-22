@@ -121,7 +121,7 @@
             visibility: hidden;
         }
 
-        /* Perfectly optimized view transitions eliminating ghosting/overlap artifacts */
+        /* Seamless view transitions eliminating ghosting/border relics */
         .view-container {
             display: none;
             opacity: 0;
@@ -179,16 +179,16 @@
         </div>
 
         <nav class="flex-1 px-4 py-6 space-y-2">
-            <button onclick="app.switchView('home')" id="nav-home" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl font-semibold transition-all">
+            <button onclick="app.switchView('home')" id="nav-home" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl font-semibold">
                 <i class="fa-solid fa-house w-6 text-center mr-2 text-base"></i> <span data-i18n="menu_dashboard">Dashboard</span>
             </button>
-            <button onclick="app.switchView('map')" id="nav-map" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl font-semibold transition-all">
+            <button onclick="app.switchView('map')" id="nav-map" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl font-semibold">
                 <i class="fa-solid fa-map w-6 text-center mr-2 text-base"></i> <span data-i18n="menu_map">Campus Map</span>
             </button>
-            <button onclick="app.switchView('history')" id="nav-history" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl font-semibold transition-all">
+            <button onclick="app.switchView('history')" id="nav-history" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl font-semibold">
                 <i class="fa-solid fa-clock-rotate-left w-6 text-center mr-2 text-base"></i> <span data-i18n="menu_history">History Log</span>
             </button>
-            <button onclick="app.switchView('profile')" id="nav-profile" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl font-semibold transition-all">
+            <button onclick="app.switchView('profile')" id="nav-profile" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl font-semibold">
                 <i class="fa-solid fa-user-gear w-6 text-center mr-2 text-base"></i> <span data-i18n="menu_profile">System Profile</span>
             </button>
         </nav>
@@ -287,7 +287,7 @@
                     <h2 class="text-lg md:text-xl font-bold text-main" data-i18n="history_title">System History & Analytics Log</h2>
                     <p class="text-xs md:text-sm text-muted" data-i18n="history_sub">Real-time tracking of vehicle entry and parking occupancy analytics</p>
                 </div>
-                <button onclick="app.parkingManager.clearLogs()" class="flex items-center gap-2 px-4 py-2.5 subtle-surface hover:opacity-80 text-main rounded-xl text-xs md:text-sm font-bold transition-all border border-theme shadow-sm">
+                <button onclick="app.parkingManager.clearLogs()" class="flex items-center gap-2 px-4 py-2.5 subtle-surface hover:opacity-80 text-main rounded-xl text-xs md:text-sm font-semibold transition-all border border-theme shadow-sm">
                     <i class="fa-solid fa-trash-can text-rose-500"></i> <span data-i18n="clear_logs_btn">Clear Logs</span>
                 </button>
             </header>
@@ -1001,7 +1001,6 @@
             switchView(viewName) {
                 const views = ['home', 'map', 'history', 'profile', 'detail'];
                 
-                // Immediately synchronize view activation with requestAnimationFrame to prevent reflow stutter and ghosting artifacts
                 views.forEach(v => {
                     const el = document.getElementById(`view-${v}`);
                     if (el) {
@@ -1021,10 +1020,10 @@
                     const navBtn = document.getElementById(`nav-${m}`);
                     const mobBtn = document.getElementById(`mob-${m}`);
                     if (m === viewName) {
-                        if (navBtn) navBtn.className = "nav-btn w-full flex items-center px-4 py-3 rounded-xl font-bold transition-all bg-primary-light text-primary-theme border border-theme shadow-sm";
+                        if (navBtn) navBtn.className = "nav-btn w-full flex items-center px-4 py-3 rounded-xl font-bold bg-primary-light text-primary-theme border border-theme shadow-sm";
                         if (mobBtn) mobBtn.className = "mob-btn flex flex-col items-center justify-center w-full text-primary-theme font-bold py-2";
                     } else {
-                        if (navBtn) navBtn.className = "nav-btn w-full flex items-center px-4 py-3 rounded-xl font-semibold transition-all text-muted hover:opacity-80";
+                        if (navBtn) navBtn.className = "nav-btn w-full flex items-center px-4 py-3 rounded-xl font-semibold text-muted hover:opacity-80";
                         if (mobBtn) mobBtn.className = "mob-btn flex flex-col items-center justify-center w-full text-muted py-2";
                     }
                 });
