@@ -916,6 +916,28 @@
                             txt.textContent = 'Camera Active';
                             dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse';
                         }
+
+                        // ---> เพิ่มโค้ดส่วนนี้เพื่ออัปเดตข้อมูลตัวเลขบนหน้าจอ <---
+                        if (data && data.buildings) {
+                            // อัปเดตข้อมูลตึกในระบบให้ตรงกับที่ AI ส่งมา
+                            data.buildings.forEach(apiBuilding => {
+                                let localBuilding = this.buildings.find(b => b.id === apiBuilding.id);
+                                if (localBuilding) {
+                                    localBuilding.slots = apiBuilding.slots;
+                                }
+                            });
+                            
+                            // สั่งให้หน้าจอรีเฟรชตัวเลขใหม่
+                            this.renderDashboard(); 
+                            this.updateAnalytics(); 
+
+                            // ถ้าผู้ใช้กำลังเปิดหน้ารายละเอียดตึก (แผนผังช่องจอด) ให้อัปเดตด้วย
+                            if (this.currentActiveBuilding) {
+                                app.renderSlots();
+                                app.updateDetailStats();
+                            }
+                        }
+                        // ----------------------------------------------
                     })
                     .catch(() => {
                         const dot = document.getElementById('api-status-dot');
