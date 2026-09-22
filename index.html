@@ -1,175 +1,610 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KKU Parking Dashboard</title>
+    <title>KKU Parking - Desktop System</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Load Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'kku-red': '#a51931',
+                        'kku-red-light': '#c52844',
+                        'kku-red-dark': '#7d1224',
+                        'kku-bg': '#fcfcfc',
+                        'available': '#10b981',
+                        'occupied': '#ef4444'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        :root {
-            --kku-red: #a52a2a; 
-            --bg-color: #f8f9fa;
-            --card-bg: #ffffff;
-            --success: #2ecc71;
-            --danger: #e74c3c;
-        }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            display: flex;
-        }
-        /* เมนูด้านซ้าย */
-        .sidebar {
-            width: 250px;
-            background-color: var(--card-bg);
-            height: 100vh;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
-            padding: 20px 0;
-            position: fixed;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .sidebar h2 { color: var(--kku-red); margin-bottom: 30px; }
-        .menu-item {
-            width: 80%; padding: 12px 20px; margin: 8px 0;
-            color: #333; border-radius: 8px; text-align: center;
-            font-weight: bold; cursor: pointer; transition: 0.2s;
-        }
-        .menu-item.active, .menu-item:hover {
-            background-color: var(--kku-red); color: white;
-        }
-        
-        /* เนื้อหาหลัก */
-        .main-content {
-            margin-left: 250px; padding: 40px;
-            width: calc(100% - 250px);
-            display: flex; flex-direction: column; align-items: center;
-        }
-        
-        /* ไฟสถานะการเชื่อมต่อมุมขวาบน */
-        .connection-status {
-            position: absolute; top: 20px; right: 40px;
-            display: flex; align-items: center; gap: 8px;
-            font-weight: bold; padding: 8px 16px; border-radius: 20px;
-            background: var(--card-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .status-dot {
-            width: 12px; height: 12px; border-radius: 50%;
-            background-color: var(--danger); /* ค่าเริ่มต้นสีแดง */
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.2); opacity: 0.7; }
-            100% { transform: scale(1); opacity: 1; }
+            background-color: #fcfcfc;
+            color: #1e293b;
         }
 
-        .header-stats { display: flex; gap: 30px; margin-top: 40px; margin-bottom: 40px; }
-        .stat-card {
-            background: var(--card-bg); padding: 20px 40px;
-            border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center;
+        /* Splash Screen Transitions */
+        #splash-screen {
+            transition: opacity 0.6s ease-in-out, visibility 0.6s ease-in-out;
         }
-        .stat-card h3 { margin: 0; color: #666; font-size: 16px; }
-        .stat-card .number { font-size: 32px; font-weight: bold; margin-top: 10px; }
-        .text-success { color: var(--success); }
-        .text-danger { color: var(--danger); }
+        
+        .fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
 
-        .parking-grid { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
-        .slot {
-            width: 140px; height: 200px; border: 4px solid #ccc;
-            border-radius: 12px; display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            font-size: 32px; font-weight: bold; background-color: var(--card-bg);
-            transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        /* View Transitions */
+        .view-container {
+            transition: opacity 0.3s ease, transform 0.3s ease;
         }
-        .slot.available { border-color: var(--success); color: var(--success); }
-        .slot.occupied { border-color: var(--danger); color: var(--danger); background-color: #ffeaea; }
-        .status-badge {
-            font-size: 16px; margin-top: 15px; padding: 4px 12px;
-            border-radius: 20px; background: #eee; color: #333;
+
+        .view-hidden {
+            opacity: 0;
+            pointer-events: none;
+            position: absolute;
+            transform: translateY(10px);
+            visibility: hidden;
+        }
+
+        .view-active {
+            opacity: 1;
+            pointer-events: auto;
+            position: relative;
+            transform: translateY(0);
+            visibility: visible;
+        }
+
+        /* Custom Scrollbar for Desktop */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Slot Hover Effects */
+        .parking-slot {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .parking-slot:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
     </style>
 </head>
-<body>
+<body class="antialiased h-screen overflow-hidden flex selection:bg-kku-red selection:text-white">
 
-    <div class="sidebar">
-        <h2>KKU Parking</h2>
-        <div class="menu-item active">หน้าหลัก (Home)</div>
-        <div class="menu-item">ประวัติ (History)</div>
-        <div class="menu-item">แผนที่ (Map)</div>
-        <div class="menu-item">โปรไฟล์ (Profile)</div>
+    <!-- ================= SPLASH SCREEN ================= -->
+    <div id="splash-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white">
+        <div class="w-32 h-32 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mb-6 shadow-sm animate-pulse">
+            <i class="fa-solid fa-building-columns text-5xl text-kku-red"></i>
+        </div>
+        <h1 class="text-3xl font-bold text-slate-900 tracking-tight">KKU Parking</h1>
+        <p class="text-slate-500 mt-2 text-sm font-medium uppercase tracking-widest">Management System</p>
     </div>
 
-    <div class="main-content">
-        <!-- ไฟสถานะ -->
-        <div class="connection-status">
-            <div class="status-dot" id="conn-dot"></div>
-            <span id="conn-text">Camera Offline</span>
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="w-64 bg-white border-r border-slate-200 h-full flex flex-col z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)] fixed left-0 top-0">
+        <!-- Logo Area -->
+        <div class="h-20 flex items-center px-6 border-b border-slate-100">
+            <i class="fa-solid fa-building-columns text-2xl text-kku-red mr-3"></i>
+            <div>
+                <h1 class="text-lg font-bold text-slate-900 leading-tight">KKU Parking</h1>
+                <p class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Admin Portal</p>
+            </div>
         </div>
 
-        <div class="header-stats">
-            <div class="stat-card"><h3>ลานจอดทั้งหมด</h3><div class="number">5</div></div>
-            <div class="stat-card"><h3>ว่าง</h3><div class="number text-success" id="count-available">5</div></div>
-            <div class="stat-card"><h3>ไม่ว่าง</h3><div class="number text-danger" id="count-occupied">0</div></div>
+        <!-- Navigation Links -->
+        <nav class="flex-1 px-4 py-6 space-y-2">
+            <button class="w-full flex items-center px-4 py-3 bg-kku-red/5 text-kku-red rounded-xl font-medium transition-colors border border-kku-red/10">
+                <i class="fa-solid fa-house w-6 text-center mr-2"></i>
+                Dashboard
+            </button>
+            <button class="w-full flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl font-medium transition-colors">
+                <i class="fa-solid fa-map w-6 text-center mr-2"></i>
+                Campus Map
+            </button>
+            <button class="w-full flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl font-medium transition-colors">
+                <i class="fa-solid fa-clock-rotate-left w-6 text-center mr-2"></i>
+                History Log
+            </button>
+            <button class="w-full flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl font-medium transition-colors">
+                <i class="fa-solid fa-user-gear w-6 text-center mr-2"></i>
+                System Profile
+            </button>
+        </nav>
+
+        <!-- User Profile Bottom -->
+        <div class="p-4 border-t border-slate-100">
+            <div class="flex items-center px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 hover:border-slate-300 transition-colors cursor-pointer">
+                <div class="w-8 h-8 rounded-full bg-kku-red text-white flex items-center justify-center font-bold text-sm mr-3">
+                    AD
+                </div>
+                <div class="flex-1 overflow-hidden">
+                    <p class="text-sm font-semibold text-slate-900 truncate">Administrator</p>
+                    <p class="text-xs text-slate-500 truncate">admin@kku.ac.th</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="flex-1 h-full flex flex-col relative bg-slate-50/50 ml-64">
+        
+        <!-- HOME VIEW (Dashboard) -->
+        <div id="view-home" class="view-container view-active h-full flex flex-col w-full absolute inset-0 overflow-y-auto">
+            
+            <!-- Top Header -->
+            <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-10">
+                <h2 class="text-xl font-bold text-slate-800">Overview Dashboard</h2>
+                
+                <!-- Search Bar -->
+                <div class="w-96 relative group">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-kku-red transition-colors"></i>
+                    <input type="text" placeholder="Search building name or lot ID..." class="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-full text-sm focus:outline-none focus:bg-white focus:border-kku-red/50 focus:ring-4 focus:ring-kku-red/10 transition-all">
+                </div>
+
+                <!-- API Connection Status -->
+                <div id="api-status" class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-200 bg-slate-50 text-xs font-medium text-slate-500">
+                    <span id="api-status-dot" class="w-2 h-2 rounded-full bg-slate-400 animate-pulse"></span>
+                    <span id="api-status-text">Connecting to Camera...</span>
+                </div>
+            </header>
+
+            <div class="p-8 max-w-7xl mx-auto w-full">
+                
+                <!-- System Status Summary -->
+                <div class="mb-8">
+                    <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Real-time Capacity</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center">
+                            <div class="w-14 h-14 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xl mr-5">
+                                <i class="fa-solid fa-car"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-slate-500 font-medium">Total Spaces</p>
+                                <p id="global-total" class="text-3xl font-bold text-slate-800">50</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center">
+                            <div class="w-14 h-14 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl mr-5 relative">
+                                <span class="absolute top-1 right-1 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full animate-pulse"></span>
+                                <i class="fa-solid fa-circle-check"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-slate-500 font-medium">Available</p>
+                                <p id="global-available" class="text-3xl font-bold text-available">50</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center">
+                            <div class="w-14 h-14 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xl mr-5">
+                                <i class="fa-solid fa-ban"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-slate-500 font-medium">Occupied</p>
+                                <p id="global-occupied" class="text-3xl font-bold text-occupied">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parking Buildings Grid -->
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider">Managed Facilities</h3>
+                        <button class="text-sm text-kku-red font-medium hover:underline flex items-center">
+                            Refresh <i class="fa-solid fa-rotate-right ml-2 text-xs"></i>
+                        </button>
+                    </div>
+                    
+                    <div id="buildings-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Buildings will be injected here via JavaScript -->
+                    </div>
+                </div>
+                
+            </div>
         </div>
 
-        <div class="parking-grid">
-            <div id="slot-A1" class="slot available">A1<div class="status-badge">ว่าง</div></div>
-            <div id="slot-A2" class="slot available">A2<div class="status-badge">ว่าง</div></div>
-            <div id="slot-A3" class="slot available">A3<div class="status-badge">ว่าง</div></div>
-            <div id="slot-A4" class="slot available">A4<div class="status-badge">ว่าง</div></div>
-            <div id="slot-A5" class="slot available">A5<div class="status-badge">ว่าง</div></div>
+        <!-- DETAIL VIEW (Single Building Layout) -->
+        <div id="view-detail" class="view-container view-hidden h-full flex flex-col w-full absolute inset-0 overflow-y-auto bg-white">
+            
+            <!-- Detail Header -->
+            <header class="h-20 bg-white border-b border-slate-200 flex items-center px-8 sticky top-0 z-10">
+                <button onclick="navigateBack()" class="w-10 h-10 flex items-center justify-center bg-slate-50 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-kku-red transition-colors mr-6">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div>
+                    <h2 id="detail-building-name" class="text-xl font-bold text-slate-800">Building Name</h2>
+                    <p id="detail-building-desc" class="text-sm text-slate-500">Location description</p>
+                </div>
+                <div class="ml-auto flex gap-3">
+                    <div class="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-bold border border-emerald-100">
+                        Available: <span id="detail-av-count">10</span>
+                    </div>
+                    <div class="px-4 py-2 bg-red-50 text-red-700 rounded-lg text-sm font-bold border border-red-100">
+                        Occupied: <span id="detail-occ-count">0</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="p-8 flex-1 flex flex-col items-center justify-center bg-slate-50/50">
+                
+                <div class="w-full max-w-4xl bg-white p-10 rounded-3xl border border-slate-200 shadow-sm relative">
+                    
+                    <div class="flex justify-between items-center mb-12">
+                        <div>
+                            <h3 class="font-bold text-lg text-slate-800">Ground Floor Plan</h3>
+                            <p class="text-sm text-slate-500">Click a slot to toggle its status manually for testing.</p>
+                        </div>
+                        <div class="flex items-center text-sm font-semibold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
+                            Live Sensors Active
+                        </div>
+                    </div>
+
+                    <!-- Layout Container -->
+                    <div class="relative bg-slate-50 border-2 border-slate-200 rounded-2xl p-8">
+                        
+                        <!-- Top Row (5 Slots) -->
+                        <div id="slots-top" class="grid grid-cols-5 gap-6 mb-12">
+                            <!-- Injected via JS -->
+                        </div>
+
+                        <!-- Driving Path -->
+                        <div class="flex items-center justify-between text-slate-400 font-bold uppercase tracking-widest px-4 absolute left-0 right-0 top-1/2 -translate-y-1/2">
+                            <div class="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded">
+                                <i class="fa-solid fa-arrow-right"></i> ENTRY
+                            </div>
+                            
+                            <!-- Road lines -->
+                            <div class="flex-1 flex justify-center gap-8 px-8">
+                                <div class="w-8 h-1.5 bg-slate-300 rounded-full"></div>
+                                <div class="w-8 h-1.5 bg-slate-300 rounded-full"></div>
+                                <div class="w-8 h-1.5 bg-slate-300 rounded-full"></div>
+                                <div class="w-8 h-1.5 bg-slate-300 rounded-full"></div>
+                            </div>
+
+                            <div class="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded">
+                                EXIT <i class="fa-solid fa-arrow-right"></i>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Row (5 Slots) -->
+                        <div id="slots-bottom" class="grid grid-cols-5 gap-6 mt-12">
+                            <!-- Injected via JS -->
+                        </div>
+
+                    </div>
+
+                    <!-- Legend -->
+                    <div class="flex justify-center gap-8 mt-10 pt-6 border-t border-slate-100">
+                        <div class="flex items-center gap-3 text-sm text-slate-600 font-medium">
+                            <div class="w-6 h-6 rounded-md bg-emerald-50 border border-emerald-400 flex items-center justify-center">
+                                <div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+                            </div>
+                            Available
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-slate-600 font-medium">
+                            <div class="w-6 h-6 rounded-md bg-red-50 border border-red-400 flex items-center justify-center">
+                                <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                            </div>
+                            Occupied
+                        </div>
+                    </div>
+
+                </div>
+            </div>
         </div>
-    </div>
+    </main>
 
     <script>
-        // ==========================================
-        // เอาลิงก์ Ngrok ของคุณมาใส่ตรงนี้ (อย่าเผลอลบ /api/status ด้านหลังสุด)
-        // ==========================================
-        const API_URL = 'http://localhost:5000/api/status'; 
+        // Initial State Data
+        const buildingsData = [
+            { id: 'A', name: 'Building A', desc: 'Engineer building', total: 10, slots: Array(10).fill(true) },
+            { id: 'B', name: 'Building B', desc: 'Science building', total: 10, slots: Array(10).fill(true) },
+            { id: 'C', name: 'Building C', desc: 'Business building', total: 10, slots: Array(10).fill(true) },
+            { id: 'D', name: 'Building D', desc: 'Humanity building', total: 10, slots: Array(10).fill(true) },
+            { id: 'E', name: 'Building E', desc: 'Library building', total: 10, slots: Array(10).fill(true) }
+        ];
 
-        function fetchParkingStatus() {
+        let currentActiveBuilding = null;
+        
+        // ==========================================
+        // API CONFIGURATION
+        // ==========================================
+        // เปลี่ยนลิงก์นี้ให้เป็นลิงก์ Ngrok ของคุณเมื่อนำไปขึ้น Netlify
+        // เช่น 'https://xxxx-xxxx.ngrok-free.app/api/status'
+        const API_URL = 'http://localhost:5000/api/status';
+        let isApiConnected = false;
+
+        // Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            // Remove splash screen
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                splash.classList.add('fade-out');
+                setTimeout(() => splash.remove(), 600);
+            }, 1500);
+
+            renderDashboard();
+            
+            // เริ่มต้นระบบดึงข้อมูลจาก API
+            startApiPolling();
+        });
+
+        // ==========================================
+        // API COMMUNICATION
+        // ==========================================
+        function updateConnectionStatus(connected) {
+            const statusDiv = document.getElementById('api-status');
+            const statusDot = document.getElementById('api-status-dot');
+            const statusText = document.getElementById('api-status-text');
+
+            isApiConnected = connected;
+
+            if (connected) {
+                statusDiv.classList.replace('bg-slate-50', 'bg-emerald-50');
+                statusDiv.classList.replace('border-slate-200', 'border-emerald-200');
+                statusText.classList.replace('text-slate-500', 'text-emerald-700');
+                statusText.textContent = 'Camera Active';
+                statusDot.classList.replace('bg-slate-400', 'bg-emerald-500');
+                statusDot.classList.replace('bg-red-500', 'bg-emerald-500');
+            } else {
+                statusDiv.classList.replace('bg-emerald-50', 'bg-red-50');
+                statusDiv.classList.replace('border-emerald-200', 'border-red-200');
+                statusText.classList.replace('text-emerald-700', 'text-red-700');
+                statusText.textContent = 'Camera Offline';
+                statusDot.classList.replace('bg-emerald-500', 'bg-red-500');
+            }
+        }
+
+        function fetchLiveStatus() {
             fetch(API_URL)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
                 .then(data => {
-                    // เปลี่ยนไฟสถานะเป็นออนไลน์ (สีเขียว)
-                    document.getElementById('conn-dot').style.backgroundColor = '#2ecc71';
-                    document.getElementById('conn-text').innerText = 'Camera Active';
-                    document.getElementById('conn-text').style.color = '#2ecc71';
-
-                    let availableCount = 0;
-                    let occupiedCount = 0;
-
-                    for (const [slotId, isOccupied] of Object.entries(data)) {
-                        const slotElement = document.getElementById('slot-' + slotId);
-                        if (slotElement) {
-                            const badge = slotElement.querySelector('.status-badge');
-                            if (isOccupied) {
-                                slotElement.className = 'slot occupied';
-                                badge.innerText = 'มีรถจอด';
-                                badge.style.background = '#e74c3c'; badge.style.color = 'white';
-                                occupiedCount++;
-                            } else {
-                                slotElement.className = 'slot available';
-                                badge.innerText = 'ว่าง';
-                                badge.style.background = '#2ecc71'; badge.style.color = 'white';
-                                availableCount++;
+                    updateConnectionStatus(true);
+                    
+                    // สมมติว่า API ส่งข้อมูลมาในรูปแบบ {"A1": true, "A2": false, ...}
+                    // เราจะเอาข้อมูลมาอัปเดต Building A ก่อนเป็นตัวอย่าง
+                    const buildingA = buildingsData.find(b => b.id === 'A');
+                    if(buildingA) {
+                        // แมปข้อมูลจาก API เข้ากับ slots ของ Building A (ดึงมา 10 ช่อง)
+                        // สมมติว่า API มี key A1 ถึง A10
+                        for(let i = 0; i < 10; i++) {
+                            const slotKey = `A${i+1}`;
+                            if(data[slotKey] !== undefined) {
+                                // API คืนค่า True หมายถึง มีรถจอด (ว่าง = false)
+                                // แต่โค้ดเก่าของเรา: slot value true = ว่าง
+                                // ดังนั้นต้องกลับค่า
+                                buildingA.slots[i] = !data[slotKey]; 
                             }
                         }
                     }
-                    document.getElementById('count-available').innerText = availableCount;
-                    document.getElementById('count-occupied').innerText = occupiedCount;
+
+                    // อัปเดตหน้าจอถ้ามีการเปลี่ยนข้อมูล
+                    updateGlobalStats();
+                    renderDashboard(); // อัปเดตกราฟหน้าแรก
+                    
+                    // ถ้ากำลังเปิดดูหน้ารายละเอียดของตึกนั้นอยู่ ให้รีเฟรช slots ด้วย
+                    if (currentActiveBuilding && document.getElementById('view-detail').classList.contains('view-active')) {
+                        renderSlots();
+                        updateDetailStats();
+                    }
                 })
                 .catch(error => {
-                    // เปลี่ยนไฟสถานะเป็นออฟไลน์ (สีแดง) เมื่อไม่เจอ API
-                    document.getElementById('conn-dot').style.backgroundColor = '#e74c3c';
-                    document.getElementById('conn-text').innerText = 'Camera Offline';
-                    document.getElementById('conn-text').style.color = '#e74c3c';
+                    // console.error('API Fetch Error:', error);
+                    updateConnectionStatus(false);
                 });
         }
 
-        setInterval(fetchParkingStatus, 1000);
+        function startApiPolling() {
+            // ดึงข้อมูลครั้งแรกทันที
+            fetchLiveStatus();
+            // จากนั้นดึงทุกๆ 1 วินาที
+            setInterval(fetchLiveStatus, 1000);
+        }
+
+        function getBuildingStats(building) {
+            const available = building.slots.filter(status => status === true).length;
+            const occupied = building.total - available;
+            const percentage = (available / building.total) * 100;
+            return { available, occupied, percentage };
+        }
+
+        function updateGlobalStats() {
+            let t = 0, a = 0, o = 0;
+            buildingsData.forEach(b => {
+                const stats = getBuildingStats(b);
+                t += b.total;
+                a += stats.available;
+                o += stats.occupied;
+            });
+
+            document.getElementById('global-total').textContent = t;
+            document.getElementById('global-available').textContent = a;
+            document.getElementById('global-occupied').textContent = o;
+        }
+
+        function renderDashboard() {
+            updateGlobalStats();
+            const grid = document.getElementById('buildings-grid');
+            grid.innerHTML = '';
+
+            buildingsData.forEach(b => {
+                const stats = getBuildingStats(b);
+                
+                const card = document.createElement('div');
+                card.className = 'bg-white p-6 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-kku-red/50 hover:shadow-md transition-all group';
+                card.onclick = () => openBuildingDetail(b.id);
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <h4 class="font-bold text-lg text-slate-800 group-hover:text-kku-red transition-colors">${b.name}</h4>
+                            <p class="text-xs text-slate-500 mt-1">${b.desc}</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center">
+                            <span class="text-lg font-bold text-slate-700 leading-none">${stats.available}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-2 flex justify-between text-xs font-semibold">
+                        <span class="text-slate-500">Capacity</span>
+                        <span class="text-slate-800">${stats.percentage}% Free</span>
+                    </div>
+                    
+                    <div class="w-full h-2.5 bg-red-100 rounded-full flex overflow-hidden">
+                        <div class="h-full bg-emerald-400 rounded-full transition-all duration-500" style="width: ${stats.percentage}%"></div>
+                    </div>
+                    
+                    <div class="mt-4 flex gap-4 text-xs">
+                        <div class="flex items-center text-emerald-600 font-medium">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>${stats.available} Open
+                        </div>
+                        <div class="flex items-center text-red-500 font-medium">
+                            <span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span>${stats.occupied} Full
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function openBuildingDetail(buildingId) {
+            currentActiveBuilding = buildingsData.find(b => b.id === buildingId);
+            
+            // Update Headers
+            document.getElementById('detail-building-name').textContent = currentActiveBuilding.name;
+            document.getElementById('detail-building-desc').textContent = currentActiveBuilding.desc;
+            
+            renderSlots();
+            updateDetailStats();
+
+            // Switch Views
+            document.getElementById('view-home').classList.replace('view-active', 'view-hidden');
+            document.getElementById('view-detail').classList.replace('view-hidden', 'view-active');
+        }
+
+        function navigateBack() {
+            // Re-render dashboard to reflect any changed states
+            renderDashboard();
+            
+            // Switch Views
+            document.getElementById('view-detail').classList.replace('view-active', 'view-hidden');
+            document.getElementById('view-home').classList.replace('view-hidden', 'view-active');
+            
+            currentActiveBuilding = null;
+        }
+
+        function updateDetailStats() {
+            if(!currentActiveBuilding) return;
+            const stats = getBuildingStats(currentActiveBuilding);
+            document.getElementById('detail-av-count').textContent = stats.available;
+            document.getElementById('detail-occ-count').textContent = stats.occupied;
+        }
+
+        function toggleSlot(index) {
+            if(!currentActiveBuilding) return;
+            // Toggle boolean value (simulate a car parking/leaving)
+            currentActiveBuilding.slots[index] = !currentActiveBuilding.slots[index];
+            
+            // Re-render
+            renderSlots();
+            updateDetailStats();
+        }
+
+        function renderSlots() {
+            if(!currentActiveBuilding) return;
+
+            const topRow = document.getElementById('slots-top');
+            const bottomRow = document.getElementById('slots-bottom');
+            
+            topRow.innerHTML = '';
+            bottomRow.innerHTML = '';
+
+            currentActiveBuilding.slots.forEach((isAvailable, index) => {
+                const slotNum = index + 1;
+                const isTopRow = index < 5;
+                
+                const slotDiv = document.createElement('div');
+                
+                // Base classes for the parking bay
+                let classes = 'parking-slot relative h-32 border-2 rounded-lg flex flex-col items-center justify-center cursor-pointer bg-white group ';
+                
+                // Add opening side styling
+                if (isTopRow) {
+                    classes += 'border-b-0 rounded-b-none ';
+                } else {
+                    classes += 'border-t-0 rounded-t-none ';
+                }
+
+                // Status styling
+                if (isAvailable) {
+                    classes += 'border-emerald-400 hover:bg-emerald-50';
+                } else {
+                    classes += 'border-red-400 bg-red-50/50';
+                }
+
+                slotDiv.className = classes;
+                slotDiv.onclick = () => toggleSlot(index);
+                
+                // Car icon visualization for occupied state
+                const carVisual = isAvailable ? 
+                    `<div class="w-2.5 h-2.5 rounded-full bg-emerald-500 mb-2"></div>` : 
+                    `<i class="fa-solid fa-car text-3xl text-red-400 mb-2 ${isTopRow ? 'rotate-180' : ''}"></i>`;
+
+                const labelColor = isAvailable ? 'text-emerald-700' : 'text-red-700';
+
+                slotDiv.innerHTML = `
+                    ${carVisual}
+                    <span class="text-sm font-bold ${labelColor} ${isTopRow ? '' : 'rotate-180'}">
+                        ${currentActiveBuilding.id}-${String(slotNum).padStart(2, '0')}
+                    </span>
+                    
+                    <!-- Hover tooltip for interaction hint -->
+                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity ${isTopRow ? 'rounded-t-lg' : 'rounded-b-lg'}">
+                        <span class="text-white text-xs font-semibold px-2 text-center">
+                            Click to ${isAvailable ? 'Park' : 'Leave'}
+                        </span>
+                    </div>
+                `;
+
+                if (isTopRow) {
+                    topRow.appendChild(slotDiv);
+                } else {
+                    bottomRow.appendChild(slotDiv);
+                }
+            });
+        }
     </script>
 </body>
 </html>
