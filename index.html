@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KKU Parking</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; background: #f4f4f9; }
+        h1 { color: #a52a2a; }
+        .grid { display: flex; gap: 15px; margin-top: 20px; }
+        .slot {
+            width: 100px; height: 150px; border: 3px solid #ccc; border-radius: 8px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-size: 24px; font-weight: bold; background: white; transition: 0.3s;
+        }
+        .slot.available { border-color: #2ecc71; color: #2ecc71; }
+        .slot.occupied { border-color: #e74c3c; color: #e74c3c; background: #ffeaea; }
+        .status { font-size: 14px; margin-top: 8px; }
+    </style>
+</head>
+<body>
+    <h1>KKU Parking Live</h1>
+    <div class="grid">
+        <div id="slot-A1" class="slot available">A1<div class="status">ว่าง</div></div>
+        <div id="slot-A2" class="slot available">A2<div class="status">ว่าง</div></div>
+        <div id="slot-A3" class="slot available">A3<div class="status">ว่าง</div></div>
+        <div id="slot-A4" class="slot available">A4<div class="status">ว่าง</div></div>
+        <div id="slot-A5" class="slot available">A5<div class="status">ว่าง</div></div>
+    </div>
+
+    <script>
+        function updateStatus() {
+            fetch('http://localhost:5000/api/status')
+                .then(res => res.json())
+                .then(data => {
+                    for (const [id, isOccupied] of Object.entries(data)) {
+                        const el = document.getElementById(`slot-${id}`);
+                        if (el) {
+                            if (isOccupied) {
+                                el.className = 'slot occupied';
+                                el.querySelector('.status').innerText = 'ไม่ว่าง';
+                            } else {
+                                el.className = 'slot available';
+                                el.querySelector('.status').innerText = 'ว่าง';
+                            }
+                        }
+                    }
+                })
+                .catch(err => console.error("API Error:", err));
+        }
+        setInterval(updateStatus, 1000); // อัปเดตทุก 1 วินาที
+    </script>
+</body>
+</html>
