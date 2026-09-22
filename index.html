@@ -107,8 +107,8 @@
         <p class="text-slate-500 mt-2 text-sm font-medium uppercase tracking-widest">Management System</p>
     </div>
 
-    <!-- ================= SIDEBAR ================= -->
-    <aside class="w-64 bg-white border-r border-slate-200 h-full flex flex-col z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)] fixed left-0 top-0">
+    <!-- ================= SIDEBAR (แสดงบนคอม, ซ่อนบนมือถือ) ================= -->
+    <aside class="w-64 bg-white border-r border-slate-200 h-full hidden md:flex flex-col z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)] fixed left-0 top-0">
         <!-- Logo Area -->
         <div class="h-20 flex items-center px-6 border-b border-slate-100">
             <i class="fa-solid fa-building-columns text-2xl text-kku-red mr-3"></i>
@@ -153,17 +153,17 @@
     </aside>
 
     <!-- ================= MAIN CONTENT ================= -->
-    <main class="flex-1 h-full flex flex-col relative bg-slate-50/50 ml-64">
+    <main class="flex-1 h-full flex flex-col relative bg-slate-50/50 md:ml-64 pb-20 md:pb-0">
         
         <!-- HOME VIEW (Dashboard) -->
         <div id="view-home" class="view-container view-active h-full flex flex-col w-full absolute inset-0 overflow-y-auto">
             
             <!-- Top Header -->
-            <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-10">
-                <h2 class="text-xl font-bold text-slate-800">Overview Dashboard</h2>
+            <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 sticky top-0 z-10">
+                <h2 class="text-lg md:text-xl font-bold text-slate-800">Overview Dashboard</h2>
                 
                 <!-- Search Bar -->
-                <div class="w-96 relative group">
+                <div class="w-64 md:w-96 relative group hidden sm:block">
                     <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-kku-red transition-colors"></i>
                     <input type="text" placeholder="Search building name or lot ID..." class="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-full text-sm focus:outline-none focus:bg-white focus:border-kku-red/50 focus:ring-4 focus:ring-kku-red/10 transition-all">
                 </div>
@@ -171,11 +171,11 @@
                 <!-- API Connection Status -->
                 <div id="api-status" class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-200 bg-slate-50 text-xs font-medium text-slate-500">
                     <span id="api-status-dot" class="w-2 h-2 rounded-full bg-slate-400 animate-pulse"></span>
-                    <span id="api-status-text">Connecting to Camera...</span>
+                    <span id="api-status-text">Connecting...</span>
                 </div>
             </header>
 
-            <div class="p-8 max-w-7xl mx-auto w-full">
+            <div class="p-4 md:p-8 max-w-7xl mx-auto w-full">
                 
                 <!-- System Status Summary -->
                 <div class="mb-8">
@@ -235,15 +235,15 @@
         <div id="view-detail" class="view-container view-hidden h-full flex flex-col w-full absolute inset-0 overflow-y-auto bg-white">
             
             <!-- Detail Header -->
-            <header class="h-20 bg-white border-b border-slate-200 flex items-center px-8 sticky top-0 z-10">
-                <button onclick="navigateBack()" class="w-10 h-10 flex items-center justify-center bg-slate-50 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-kku-red transition-colors mr-6">
+            <header class="h-20 bg-white border-b border-slate-200 flex items-center px-4 md:px-8 sticky top-0 z-10">
+                <button onclick="navigateBack()" class="w-10 h-10 flex items-center justify-center bg-slate-50 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-kku-red transition-colors mr-4 md:mr-6">
                     <i class="fa-solid fa-arrow-left"></i>
                 </button>
                 <div>
-                    <h2 id="detail-building-name" class="text-xl font-bold text-slate-800">Building Name</h2>
-                    <p id="detail-building-desc" class="text-sm text-slate-500">Location description</p>
+                    <h2 id="detail-building-name" class="text-lg md:text-xl font-bold text-slate-800">Building Name</h2>
+                    <p id="detail-building-desc" class="text-xs md:text-sm text-slate-500">Location description</p>
                 </div>
-                <div class="ml-auto flex gap-3">
+                <div class="ml-auto hidden sm:flex gap-3">
                     <div class="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-bold border border-emerald-100">
                         Available: <span id="detail-av-count">10</span>
                     </div>
@@ -253,11 +253,11 @@
                 </div>
             </header>
 
-            <div class="p-8 flex-1 flex flex-col items-center justify-center bg-slate-50/50">
+            <div class="p-4 md:p-8 flex-1 flex flex-col items-center justify-center bg-slate-50/50">
                 
-                <div class="w-full max-w-4xl bg-white p-10 rounded-3xl border border-slate-200 shadow-sm relative">
+                <div class="w-full max-w-4xl bg-white p-6 md:p-10 rounded-3xl border border-slate-200 shadow-sm relative">
                     
-                    <div class="flex justify-between items-center mb-12">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 md:mb-12">
                         <div>
                             <h3 class="font-bold text-lg text-slate-800">Ground Floor Plan</h3>
                             <p class="text-sm text-slate-500">Click a slot to toggle its status manually for testing.</p>
@@ -269,34 +269,34 @@
                     </div>
 
                     <!-- Layout Container -->
-                    <div class="relative bg-slate-50 border-2 border-slate-200 rounded-2xl p-8">
+                    <div class="relative bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 md:p-8 overflow-x-auto">
                         
                         <!-- Top Row (5 Slots) -->
-                        <div id="slots-top" class="grid grid-cols-5 gap-6 mb-12">
+                        <div id="slots-top" class="grid grid-cols-5 gap-3 md:gap-6 mb-12 min-w-[500px]">
                             <!-- Injected via JS -->
                         </div>
 
                         <!-- Driving Path -->
-                        <div class="flex items-center justify-between text-slate-400 font-bold uppercase tracking-widest px-4 absolute left-0 right-0 top-1/2 -translate-y-1/2">
-                            <div class="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded">
+                        <div class="flex items-center justify-between text-slate-400 font-bold uppercase tracking-widest px-4 absolute left-0 right-0 top-1/2 -translate-y-1/2 min-w-[500px]">
+                            <div class="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded text-xs md:text-sm">
                                 <i class="fa-solid fa-arrow-right"></i> ENTRY
                             </div>
                             
                             <!-- Road lines -->
-                            <div class="flex-1 flex justify-center gap-8 px-8">
-                                <div class="w-8 h-1.5 bg-slate-300 rounded-full"></div>
-                                <div class="w-8 h-1.5 bg-slate-300 rounded-full"></div>
-                                <div class="w-8 h-1.5 bg-slate-300 rounded-full"></div>
-                                <div class="w-8 h-1.5 bg-slate-300 rounded-full"></div>
+                            <div class="flex-1 flex justify-center gap-4 md:gap-8 px-8">
+                                <div class="w-6 md:w-8 h-1.5 bg-slate-300 rounded-full"></div>
+                                <div class="w-6 md:w-8 h-1.5 bg-slate-300 rounded-full"></div>
+                                <div class="w-6 md:w-8 h-1.5 bg-slate-300 rounded-full"></div>
+                                <div class="w-6 md:w-8 h-1.5 bg-slate-300 rounded-full"></div>
                             </div>
 
-                            <div class="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded">
+                            <div class="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded text-xs md:text-sm">
                                 EXIT <i class="fa-solid fa-arrow-right"></i>
                             </div>
                         </div>
 
                         <!-- Bottom Row (5 Slots) -->
-                        <div id="slots-bottom" class="grid grid-cols-5 gap-6 mt-12">
+                        <div id="slots-bottom" class="grid grid-cols-5 gap-3 md:gap-6 mt-12 min-w-[500px]">
                             <!-- Injected via JS -->
                         </div>
 
@@ -323,6 +323,28 @@
         </div>
     </main>
 
+    <!-- ================= BOTTOM NAVIGATION (แสดงเฉพาะบนมือถือ) ================= -->
+    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-10px_25px_rgba(0,0,0,0.05)] rounded-t-2xl z-50">
+        <div class="flex justify-around items-center h-20 px-2">
+            <button onclick="navigateBackToHome()" class="flex flex-col items-center justify-center w-full text-kku-red">
+                <i class="fa-solid fa-house text-xl mb-1"></i>
+                <span class="text-[10px] font-bold">Dashboard</span>
+            </button>
+            <button class="flex flex-col items-center justify-center w-full text-slate-400 hover:text-kku-red">
+                <i class="fa-solid fa-map text-xl mb-1"></i>
+                <span class="text-[10px] font-medium">Campus Map</span>
+            </button>
+            <button class="flex flex-col items-center justify-center w-full text-slate-400 hover:text-kku-red">
+                <i class="fa-solid fa-clock-rotate-left text-xl mb-1"></i>
+                <span class="text-[10px] font-medium">History</span>
+            </button>
+            <button class="flex flex-col items-center justify-center w-full text-slate-400 hover:text-kku-red">
+                <i class="fa-solid fa-user-gear text-xl mb-1"></i>
+                <span class="text-[10px] font-medium">Profile</span>
+            </button>
+        </div>
+    </nav>
+
     <script>
         // Initial State Data
         const buildingsData = [
@@ -336,7 +358,7 @@
         let currentActiveBuilding = null;
         
         // ==========================================
-        // API CONFIGURATION (เชื่อมต่อผ่าน Ngrok เรียบร้อยแล้ว)
+        // API CONFIGURATION (เชื่อมต่อ Ngrok เรียบร้อยแล้ว)
         // ==========================================
         const API_URL = 'https://anthill-husband-unwatched.ngrok-free.dev/api/status';
         let isApiConnected = false;
@@ -351,8 +373,6 @@
             }, 1500);
 
             renderDashboard();
-            
-            // เริ่มต้นระบบดึงข้อมูลจาก API
             startApiPolling();
         });
 
@@ -383,7 +403,7 @@
         }
 
         function fetchLiveStatus() {
-            // เพิ่ม Headers สำหรับข้ามหน้าจอเตือนความปลอดภัยของ Ngrok (แก้ปัญหา CORS)
+            // เชื่อมต่อ Ngrok พร้อมใส่ Header ข้ามหน้าจอเตือนความปลอดภัย
             fetch(API_URL, {
                 method: 'GET',
                 headers: {
@@ -514,6 +534,12 @@
             currentActiveBuilding = null;
         }
 
+        function navigateBackToHome() {
+            if (document.getElementById('view-detail').classList.contains('view-active')) {
+                navigateBack();
+            }
+        }
+
         function updateDetailStats() {
             if(!currentActiveBuilding) return;
             const stats = getBuildingStats(currentActiveBuilding);
@@ -544,7 +570,7 @@
                 
                 const slotDiv = document.createElement('div');
                 
-                let classes = 'parking-slot relative h-32 border-2 rounded-lg flex flex-col items-center justify-center cursor-pointer bg-white group ';
+                let classes = 'parking-slot relative h-28 md:h-32 border-2 rounded-lg flex flex-col items-center justify-center cursor-pointer bg-white group ';
                 
                 if (isTopRow) {
                     classes += 'border-b-0 rounded-b-none ';
@@ -563,13 +589,13 @@
                 
                 const carVisual = isAvailable ? 
                     `<div class="w-2.5 h-2.5 rounded-full bg-emerald-500 mb-2"></div>` : 
-                    `<i class="fa-solid fa-car text-3xl text-red-400 mb-2 ${isTopRow ? 'rotate-180' : ''}"></i>`;
+                    `<i class="fa-solid fa-car text-2xl md:text-3xl text-red-400 mb-2 ${isTopRow ? 'rotate-180' : ''}"></i>`;
 
                 const labelColor = isAvailable ? 'text-emerald-700' : 'text-red-700';
 
                 slotDiv.innerHTML = `
                     ${carVisual}
-                    <span class="text-sm font-bold ${labelColor} ${isTopRow ? '' : 'rotate-180'}">
+                    <span class="text-xs md:text-sm font-bold ${labelColor} ${isTopRow ? '' : 'rotate-180'}">
                         ${currentActiveBuilding.id}-${String(slotNum).padStart(2, '0')}
                     </span>
                     
