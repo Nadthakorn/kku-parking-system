@@ -29,6 +29,7 @@ buildings_data = [
 ]
 
 # กำหนดพิกัดกรอบช่องจอดสำหรับตึก A (5 ช่องแรก A1-A5)
+# รูปแบบ: (x1, y1, x2, y2) -> สามารถปรับตัวเลขพิกัดให้ตรงกับวิดีโอของคุณได้เลย
 parking_zones = {
     0: (50, 100, 250, 300),   # A-01 (index 0)
     1: (300, 100, 500, 300),  # A-02 (index 1)
@@ -38,15 +39,13 @@ parking_zones = {
 }
 
 def check_intersection(car_box, zone_box):
-    # เช็คว่ากรอบของรถ ทับซ้อนกับกรอบของช่องจอดหรือไม่
-    x_left = max(car_box[0], zone_box[0])
-    y_top = max(car_box[1], zone_box[1])
-    x_right = min(car_box[2], zone_box[2])
-    y_bottom = min(car_box[3], zone_box[3])
+    # ใช้วิธีเช็ค "จุดกึ่งกลางของรถ" ว่าตกลงไปในกรอบช่องจอดหรือไม่ เพื่อความแม่นยำ
+    car_center_x = (car_box[0] + car_box[2]) / 2
+    car_center_y = (car_box[1] + car_box[3]) / 2
     
-    if x_right < x_left or y_bottom < y_top:
-        return False
-    return True
+    if zone_box[0] <= car_center_x <= zone_box[2] and zone_box[1] <= car_center_y <= zone_box[3]:
+        return True
+    return False
 
 def run_yolo():
     model = YOLO('yolov8n.pt')  
@@ -121,5 +120,4 @@ if __name__ == '__main__':
     t.start()
     
     print("🚀 ระบบ API รันแล้วที่ http://localhost:3000/api/status")
-    # เปลี่ยนมาใช้พอร์ต 3000 ให้ตรงกับคำสั่ง ngrok http 3000
     app.run(host='0.0.0.0', port=3000)
