@@ -6,21 +6,19 @@
     <title>KKU Parking Dashboard</title>
     <style>
         :root {
-            --kku-red: #a52a2a; /* สีอิฐ มข. */
+            --kku-red: #a52a2a; 
             --bg-color: #f8f9fa;
             --card-bg: #ffffff;
             --success: #2ecc71;
             --danger: #e74c3c;
         }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             margin: 0;
             display: flex;
         }
-
-        /* Sidebar เมนูด้านซ้าย */
+        /* เมนูด้านซ้าย */
         .sidebar {
             width: 250px;
             background-color: var(--card-bg);
@@ -32,111 +30,69 @@
             flex-direction: column;
             align-items: center;
         }
-
-        .sidebar h2 {
-            color: var(--kku-red);
-            margin-bottom: 30px;
-            text-align: center;
-            font-size: 24px;
-        }
-
+        .sidebar h2 { color: var(--kku-red); margin-bottom: 30px; }
         .menu-item {
-            width: 80%;
-            padding: 12px 20px;
-            margin: 8px 0;
-            background-color: var(--bg-color);
-            color: #333;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            text-align: center;
-            transition: all 0.2s ease;
-            cursor: pointer;
+            width: 80%; padding: 12px 20px; margin: 8px 0;
+            color: #333; border-radius: 8px; text-align: center;
+            font-weight: bold; cursor: pointer; transition: 0.2s;
         }
-
         .menu-item.active, .menu-item:hover {
-            background-color: var(--kku-red);
-            color: white;
+            background-color: var(--kku-red); color: white;
         }
-
-        /* พื้นที่เนื้อหาหลัก */
+        
+        /* เนื้อหาหลัก */
         .main-content {
-            margin-left: 250px;
-            padding: 40px;
+            margin-left: 250px; padding: 40px;
             width: calc(100% - 250px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        
+        /* ไฟสถานะการเชื่อมต่อมุมขวาบน */
+        .connection-status {
+            position: absolute; top: 20px; right: 40px;
+            display: flex; align-items: center; gap: 8px;
+            font-weight: bold; padding: 8px 16px; border-radius: 20px;
+            background: var(--card-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .status-dot {
+            width: 12px; height: 12px; border-radius: 50%;
+            background-color: var(--danger); /* ค่าเริ่มต้นสีแดง */
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
-        .header-stats {
-            display: flex;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
+        .header-stats { display: flex; gap: 30px; margin-top: 40px; margin-bottom: 40px; }
         .stat-card {
-            background: var(--card-bg);
-            padding: 20px 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            text-align: center;
-            min-width: 120px;
+            background: var(--card-bg); padding: 20px 40px;
+            border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center;
         }
-
         .stat-card h3 { margin: 0; color: #666; font-size: 16px; }
         .stat-card .number { font-size: 32px; font-weight: bold; margin-top: 10px; }
         .text-success { color: var(--success); }
         .text-danger { color: var(--danger); }
 
-        .parking-grid {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
+        .parking-grid { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
         .slot {
-            width: 140px;
-            height: 200px;
-            border: 4px solid #ccc;
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            font-weight: bold;
-            background-color: var(--card-bg);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 140px; height: 200px; border: 4px solid #ccc;
+            border-radius: 12px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            font-size: 32px; font-weight: bold; background-color: var(--card-bg);
+            transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-
-        .slot.available {
-            border-color: var(--success);
-            color: var(--success);
-        }
-
-        .slot.occupied {
-            border-color: var(--danger);
-            color: var(--danger);
-            background-color: #ffeaea;
-            transform: scale(0.98);
-        }
-
-        .status-text {
-            font-size: 16px;
-            margin-top: 15px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            background: #eee;
-            color: #333;
+        .slot.available { border-color: var(--success); color: var(--success); }
+        .slot.occupied { border-color: var(--danger); color: var(--danger); background-color: #ffeaea; }
+        .status-badge {
+            font-size: 16px; margin-top: 15px; padding: 4px 12px;
+            border-radius: 20px; background: #eee; color: #333;
         }
     </style>
 </head>
 <body>
 
-    <!-- แถบเมนูด้านซ้าย -->
     <div class="sidebar">
         <h2>KKU Parking</h2>
         <div class="menu-item active">หน้าหลัก (Home)</div>
@@ -145,37 +101,31 @@
         <div class="menu-item">โปรไฟล์ (Profile)</div>
     </div>
 
-    <!-- พื้นที่แสดงลานจอดรถ -->
     <div class="main-content">
+        <!-- ไฟสถานะ -->
+        <div class="connection-status">
+            <div class="status-dot" id="conn-dot"></div>
+            <span id="conn-text">Camera Offline</span>
+        </div>
+
         <div class="header-stats">
-            <div class="stat-card">
-                <h3>ช่องจอดทั้งหมด</h3>
-                <div class="number">5</div>
-            </div>
-            <div class="stat-card">
-                <h3>ว่าง</h3>
-                <div class="number text-success" id="count-available">5</div>
-            </div>
-            <div class="stat-card">
-                <h3>ไม่ว่าง</h3>
-                <div class="number text-danger" id="count-occupied">0</div>
-            </div>
+            <div class="stat-card"><h3>ลานจอดทั้งหมด</h3><div class="number">5</div></div>
+            <div class="stat-card"><h3>ว่าง</h3><div class="number text-success" id="count-available">5</div></div>
+            <div class="stat-card"><h3>ไม่ว่าง</h3><div class="number text-danger" id="count-occupied">0</div></div>
         </div>
 
         <div class="parking-grid">
-            <div id="slot-A1" class="slot available">A1<div class="status-text">ว่าง</div></div>
-            <div id="slot-A2" class="slot available">A2<div class="status-text">ว่าง</div></div>
-            <div id="slot-A3" class="slot available">A3<div class="status-text">ว่าง</div></div>
-            <div id="slot-A4" class="slot available">A4<div class="status-text">ว่าง</div></div>
-            <div id="slot-A5" class="slot available">A5<div class="status-text">ว่าง</div></div>
+            <div id="slot-A1" class="slot available">A1<div class="status-badge">ว่าง</div></div>
+            <div id="slot-A2" class="slot available">A2<div class="status-badge">ว่าง</div></div>
+            <div id="slot-A3" class="slot available">A3<div class="status-badge">ว่าง</div></div>
+            <div id="slot-A4" class="slot available">A4<div class="status-badge">ว่าง</div></div>
+            <div id="slot-A5" class="slot available">A5<div class="status-badge">ว่าง</div></div>
         </div>
     </div>
 
     <script>
         // ==========================================
-        // จุดที่ต้องแก้ลิงก์ก่อนเอาขึ้น Netlify
-        // ถ้าทดสอบในเครื่องตัวเอง ใช้ 'http://localhost:5000/api/status'
-        // ถ้าจะให้ Netlify ใช้ได้ ต้องใช้ลิงก์จาก Ngrok เช่น 'https://1234-abcd.ngrok-free.app/api/status'
+        // เอาลิงก์ Ngrok ของคุณมาใส่ตรงนี้ (อย่าเผลอลบ /api/status ด้านหลังสุด)
         // ==========================================
         const API_URL = 'http://localhost:5000/api/status'; 
 
@@ -183,37 +133,39 @@
             fetch(API_URL)
                 .then(response => response.json())
                 .then(data => {
+                    // เปลี่ยนไฟสถานะเป็นออนไลน์ (สีเขียว)
+                    document.getElementById('conn-dot').style.backgroundColor = '#2ecc71';
+                    document.getElementById('conn-text').innerText = 'Camera Active';
+                    document.getElementById('conn-text').style.color = '#2ecc71';
+
                     let availableCount = 0;
                     let occupiedCount = 0;
 
                     for (const [slotId, isOccupied] of Object.entries(data)) {
                         const slotElement = document.getElementById('slot-' + slotId);
-                        
                         if (slotElement) {
-                            const statusText = slotElement.querySelector('.status-text');
-                            
+                            const badge = slotElement.querySelector('.status-badge');
                             if (isOccupied) {
                                 slotElement.className = 'slot occupied';
-                                statusText.innerText = 'มีรถจอด';
-                                statusText.style.background = '#e74c3c';
-                                statusText.style.color = 'white';
+                                badge.innerText = 'มีรถจอด';
+                                badge.style.background = '#e74c3c'; badge.style.color = 'white';
                                 occupiedCount++;
                             } else {
                                 slotElement.className = 'slot available';
-                                statusText.innerText = 'ว่าง';
-                                statusText.style.background = '#2ecc71';
-                                statusText.style.color = 'white';
+                                badge.innerText = 'ว่าง';
+                                badge.style.background = '#2ecc71'; badge.style.color = 'white';
                                 availableCount++;
                             }
                         }
                     }
-
-                    // อัปเดตตัวเลขสรุปด้านบน
                     document.getElementById('count-available').innerText = availableCount;
                     document.getElementById('count-occupied').innerText = occupiedCount;
                 })
                 .catch(error => {
-                    console.error("รอการเชื่อมต่อกับกล้องวงจรปิด...", error);
+                    // เปลี่ยนไฟสถานะเป็นออฟไลน์ (สีแดง) เมื่อไม่เจอ API
+                    document.getElementById('conn-dot').style.backgroundColor = '#e74c3c';
+                    document.getElementById('conn-text').innerText = 'Camera Offline';
+                    document.getElementById('conn-text').style.color = '#e74c3c';
                 });
         }
 
