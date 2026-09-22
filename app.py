@@ -6,14 +6,22 @@ from flask_cors import CORS
 from ultralytics import YOLO
 
 app = Flask(__name__)
-CORS(app) # อนุญาตให้เว็บจาก Netlify เชื่อมต่อเข้ามาได้
+# อนุญาตให้ Netlify ดึงข้อมูลข้ามโดเมนได้
+CORS(app) 
 
-# กำหนดสถานะลานจอดรถ (False = ว่าง, True = มีรถ)
+# ==========================================
+# ⚙️ ตั้งค่าแหล่งภาพ (ตั้งค่าก่อนพรีเซนต์ตรงนี้)
+# ==========================================
+USE_CAMERA = False   # 🔴 วันซ้อมใช้ False (เล่นวิดีโอ), วันพรีเซนต์จริงเปลี่ยนเป็น True (ใช้กล้อง)
+CAMERA_INDEX = 1     # 0 = กล้องโน้ตบุ๊ก, 1 หรือ 2 = กล้อง USB ที่นำมาต่อเพิ่ม
+VIDEO_PATH = 'test_video.mp4'
+
+# สถานะเริ่มต้นของช่องจอด (False = ว่าง, True = มีรถ)
 parking_status = {
     "A1": False, "A2": False, "A3": False, "A4": False, "A5": False
 }
 
-# กำหนดพิกัดกรอบช่องจอดรถบนหน้าจอ (x_min, y_min, x_max, y_max)
+# กำหนดพิกัดกรอบช่องจอด (วันจริงที่ส่องโมเดลรถ ต้องมาแก้พิกัดตรงนี้นะครับ)
 parking_zones = {
     "A1": (50, 100, 250, 300),
     "A2": (300, 100, 500, 300),
@@ -23,7 +31,7 @@ parking_zones = {
 }
 
 def check_intersection(car_box, zone_box):
-    # เช็คว่ารถทับกับช่องจอดหรือไม่
+    # เช็คว่ากรอบของรถ ทับซ้อนกับกรอบของช่องจอดหรือไม่
     x_left = max(car_box[0], zone_box[0])
     y_top = max(car_box[1], zone_box[1])
     x_right = min(car_box[2], zone_box[2])
@@ -36,17 +44,24 @@ def check_intersection(car_box, zone_box):
 def run_yolo():
     model = YOLO('yolov8n.pt') 
     
-    # ใช้วิดีโอจำลองลานจอดรถ (ถ้าใช้กล้องให้เปลี่ยนเป็น 0)
-    video_path = 'test_video.mp4'
-    cap = cv2.VideoCapture(video_path) 
+    # เลือกว่าจะใช้กล้องจริงหรือวิดีโอ
+    if USE_CAMERA:
+        cap = cv2.VideoCapture(CAMERA_INDEX)
+        print(f"🎥 กำลังเปิดกล้อง (Index {CAMERA_INDEX})...")
+    else:
+        cap = cv2.VideoCapture(VIDEO_PATH)
+        print(f"🎬 กำลังเล่นวิดีโอจำลอง...")
     
     while True:
         success, frame = cap.read()
         if not success:
-            # วนลูปวิดีโอถ้าเล่นจบ
-            cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
-            continue
-            
+            if not USE_CAMERA:
+                cap.set(cv2.CAP_PROP_POS_FRAMES, 0) # วนลูปวิดีโอ
+                continue
+            else:
+                print("❌ สัญญาณกล้องหลุด! กรุณาตรวจสอบสาย USB")
+                break
+                
         results = model(frame, classes=[2, 3, 5, 7]) # ตรวจเฉพาะยานพาหนะ
         
         # รีเซ็ตสถานะเป็นว่างก่อนในทุกๆ เฟรม
@@ -61,11 +76,12 @@ def run_yolo():
                 # วาดกรอบสีฟ้าครอบรถที่เจอ
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)
                 
+                # เช็ครถเข้าซองจอด
                 for slot_id, zone_box in parking_zones.items():
                     if check_intersection(car_box, zone_box):
                         parking_status[slot_id] = True 
                         
-        # วาดกรอบช่องจอด
+        # วาดกรอบช่องจอด (แดง = มีรถ, เขียว = ว่าง)
         for slot_id, zone_box in parking_zones.items():
             color = (0, 0, 255) if parking_status[slot_id] else (0, 255, 0)
             cv2.rectangle(frame, (zone_box[0], zone_box[1]), (zone_box[2], zone_box[3]), color, 2)
@@ -73,9 +89,12 @@ def run_yolo():
 
         cv2.imshow("KKU Parking Camera", frame)
         
-        time.sleep(0.03) # ให้ความเร็ววิดีโอสมจริงขึ้น
+        time.sleep(0.03) 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+
+    cap.release()
+    cv2.destroyAllWindows()
 
 @app.route('/api/status')
 def get_status():
@@ -86,5 +105,5 @@ if __name__ == '__main__':
     t.daemon = True
     t.start()
     
-    print("🚀 API รันแล้วที่ http://localhost:5000/api/status")
+    print("🚀 ระบบ API รันแล้วที่ http://localhost:5000/api/status")
     app.run(host='0.0.0.0', port=5000)
