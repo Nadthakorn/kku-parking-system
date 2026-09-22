@@ -1,50 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KKU Parking - System</title>
+    <title>KKU Parking - Enterprise Management System</title>
     
-    <!-- Load Tailwind CSS -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Load FontAwesome for icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
-    <!-- Load Google Fonts (Inter) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Load Leaflet CSS (สำหรับแผนที่จริง) -->
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Leaflet CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    
-    <!-- Load Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <script>
-        // กำหนดสีธีมหลักตามที่เลือก (KKU Red / Ocean Blue / Dark Mode)
-        const currentTheme = localStorage.getItem('kku_theme') || 'red';
-        let primaryColor = '#a51931';
-        let primaryLight = '#c52844';
-        
-        if (currentTheme === 'blue') {
-            primaryColor = '#2563eb';
-            primaryLight = '#3b82f6';
-        } else if (currentTheme === 'dark') {
-            primaryColor = '#334155';
-            primaryLight = '#475569';
-        }
-
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
-                    colors: {
-                        'kku-red': primaryColor,
-                        'kku-red-light': primaryLight,
-                        'kku-red-dark': primaryColor,
-                        'kku-bg': '#fcfcfc',
-                        'available': '#10b981',
-                        'occupied': '#ef4444'
-                    },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                     }
@@ -54,274 +29,300 @@
     </script>
 
     <style>
+        :root {
+            --bg-canvas: #f8fafc;
+            --bg-surface: #ffffff;
+            --bg-card: #ffffff;
+            --bg-subtle: #f1f5f9;
+            --text-main: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --border-strong: #cbd5e1;
+            --primary: #991b1b;
+            --primary-hover: #7f1d1d;
+            --primary-light: #fef2f2;
+            --primary-text: #b91c1c;
+            --accent-glow: rgba(153, 27, 27, 0.15);
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+        }
+
+        body.theme-blue {
+            --bg-canvas: #f0f6ff;
+            --bg-surface: #ffffff;
+            --bg-card: #ffffff;
+            --bg-subtle: #e0f2fe;
+            --text-main: #1e3a8a;
+            --text-secondary: #1e40af;
+            --text-muted: #3b82f6;
+            --border-color: #bfdbfe;
+            --border-strong: #93c5fd;
+            --primary: #1d4ed8;
+            --primary-hover: #1e40af;
+            --primary-light: #eff6ff;
+            --primary-text: #2563eb;
+            --accent-glow: rgba(29, 78, 216, 0.15);
+            --shadow-sm: 0 1px 3px 0 rgba(29, 78, 216, 0.05);
+            --shadow-md: 0 10px 15px -3px rgba(29, 78, 216, 0.08);
+            --shadow-lg: 0 20px 25px -5px rgba(29, 78, 216, 0.1);
+        }
+
+        body.theme-dark {
+            --bg-canvas: #09090b;
+            --bg-surface: #121214;
+            --bg-card: #18181b;
+            --bg-subtle: #27272a;
+            --text-main: #f4f4f5;
+            --text-secondary: #e4e4e7;
+            --text-muted: #a1a1aa;
+            --border-color: #27272a;
+            --border-strong: #3f3f46;
+            --primary: #3b82f6;
+            --primary-hover: #60a5fa;
+            --primary-light: rgba(59, 130, 246, 0.15);
+            --primary-text: #60a5fa;
+            --accent-glow: rgba(59, 130, 246, 0.25);
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+        }
+
         body {
-            background-color: var(--bg-color, #fcfcfc);
-            color: var(--text-color, #1e293b);
+            background-color: var(--bg-canvas);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
             overscroll-behavior-y: none;
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* ธีมดาร์คโหมดเฉพาะตัว */
-        body.theme-dark {
-            --bg-color: #0f172a;
-            --text-color: #f8fafc;
-        }
-        body.theme-dark .bg-white {
-            background-color: #1e293b !important;
-            border-color: #334155 !important;
-            color: #f8fafc !important;
-        }
-        body.theme-dark .text-slate-800, body.theme-dark .text-slate-700 {
-            color: #f8fafc !important;
-        }
-        body.theme-dark .text-slate-500, body.theme-dark .text-slate-400 {
-            color: #94a3b8 !important;
-        }
-        body.theme-dark .bg-slate-50 {
-            background-color: #0f172a !important;
-            border-color: #334155 !important;
-            color: #f8fafc !important;
-        }
-        body.theme-dark input {
-            background-color: #0f172a !important;
-            color: #f8fafc !important;
-            border-color: #334155 !important;
-        }
+        .app-bg { background-color: var(--bg-canvas); }
+        .card-surface { background-color: var(--bg-card); border-color: var(--border-color); color: var(--text-main); box-shadow: var(--shadow-sm); }
+        .subtle-surface { background-color: var(--bg-subtle); border-color: var(--border-color); color: var(--text-main); }
+        .text-main { color: var(--text-main); }
+        .text-secondary { color: var(--text-secondary); }
+        .text-muted { color: var(--text-muted); }
+        .border-theme { border-color: var(--border-color); }
+        .border-theme-strong { border-color: var(--border-strong); }
+        .btn-primary { background-color: var(--primary); color: #ffffff; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 2px 4px var(--accent-glow); }
+        .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
+        .text-primary-theme { color: var(--primary-text); }
+        .bg-primary-light { background-color: var(--primary-light); color: var(--primary-text); }
 
         #splash-screen {
-            transition: opacity 0.6s ease-in-out, visibility 0.6s ease-in-out;
+            transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .fade-out {
             opacity: 0;
             visibility: hidden;
         }
 
+        /* Lightning-fast professional view transitions with zero ghost/overlap artifacts */
         .view-container {
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-
-        .view-hidden {
+            display: none;
             opacity: 0;
-            pointer-events: none;
-            position: absolute;
-            transform: translateY(10px);
-            visibility: hidden;
+            transform: translateY(6px);
+            transition: opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
         }
-
         .view-active {
+            display: flex !important;
             opacity: 1;
-            pointer-events: auto;
-            position: relative;
             transform: translateY(0);
-            visibility: visible;
         }
 
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg-canvas); }
+        ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
         .parking-slot {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .parking-slot:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow-md);
+        }
+
+        .glass-header {
+            background-color: var(--bg-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
         }
     </style>
 </head>
-<body class="antialiased h-screen overflow-hidden flex selection:bg-kku-red selection:text-white">
+<body class="antialiased h-screen overflow-hidden flex selection:bg-rose-500 selection:text-white">
 
-    <!-- ================= SPLASH SCREEN ================= -->
-    <div id="splash-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white">
-        <div class="w-32 h-32 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mb-6 shadow-sm animate-pulse">
-            <i class="fa-solid fa-building-columns text-5xl text-kku-red"></i>
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center" style="background-color: var(--bg-card);">
+        <div class="w-32 h-32 subtle-surface border border-theme rounded-3xl flex items-center justify-center mb-6 shadow-xl animate-pulse">
+            <i class="fa-solid fa-building-columns text-5xl text-primary-theme" id="splash-icon"></i>
         </div>
-        <h1 class="text-3xl font-bold text-slate-900 tracking-tight">KKU Parking</h1>
-        <p class="text-slate-500 mt-2 text-sm font-medium uppercase tracking-widest">Management System</p>
+        <h1 class="text-3xl font-extrabold tracking-tight text-main">KKU Parking</h1>
+        <p class="text-muted mt-2 text-xs font-semibold uppercase tracking-widest">Enterprise Management System</p>
     </div>
 
-    <!-- ================= NAVIGATION MODAL ================= -->
-    <div id="nav-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-        <div class="bg-white w-11/12 max-w-md p-6 rounded-3xl shadow-2xl border border-slate-100 space-y-6 transform scale-95 transition-transform duration-300" id="nav-modal-content">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-lg">
-                        <i class="fa-solid fa-diamond-turn-right"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-slate-800 text-base" id="nav-modal-title">Navigation Route</h3>
-                        <p class="text-xs text-slate-400" data-i18n="nav_sub">Live Traffic & Estimated Time</p>
-                    </div>
-                </div>
-                <button onclick="closeNavModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+    <!-- Desktop Sidebar -->
+    <aside id="sidebar-container" class="w-64 card-surface border-r border-theme h-full hidden md:flex flex-col z-30 fixed left-0 top-0 shadow-lg">
+        <div class="h-20 flex items-center px-6 border-b border-theme">
+            <div class="w-10 h-10 rounded-xl bg-primary-light flex items-center justify-center mr-3 font-bold text-lg">
+                <i class="fa-solid fa-building-columns text-primary-theme"></i>
             </div>
-
-            <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl space-y-3">
-                <div class="flex justify-between items-center">
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider" data-i18n="eta_label">Estimated Arrival</span>
-                    <span id="nav-eta" class="text-lg font-extrabold text-slate-800">4 - 7 mins</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider" data-i18n="traffic_label">Traffic Status</span>
-                    <span id="nav-traffic-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Normal Flow
-                    </span>
-                </div>
-                <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                    <div id="nav-traffic-bar" class="h-full bg-emerald-500 transition-all duration-500 w-1/3"></div>
-                </div>
-            </div>
-
-            <p class="text-xs text-slate-500 text-center" data-i18n="nav_desc">System will launch Google Maps with turn-by-turn driving directions.</p>
-
-            <div class="flex gap-3 pt-2">
-                <button onclick="closeNavModal()" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl text-sm transition-all" data-i18n="cancel_btn">Cancel</button>
-                <button id="nav-confirm-btn" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm shadow-sm transition-all flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-location-arrow"></i> <span data-i18n="start_maps_btn">Start Maps</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ================= SIDEBAR (Desktop) ================= -->
-    <aside class="w-64 bg-white border-r border-slate-200 h-full hidden md:flex flex-col z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)] fixed left-0 top-0">
-        <div class="h-20 flex items-center px-6 border-b border-slate-100">
-            <i class="fa-solid fa-building-columns text-2xl text-kku-red mr-3"></i>
             <div>
-                <h1 class="text-lg font-bold text-slate-900 leading-tight">KKU Parking</h1>
-                <p class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Admin Portal</p>
+                <h1 class="text-base font-bold text-main leading-tight">KKU Parking</h1>
+                <p class="text-[10px] text-muted uppercase tracking-wider font-extrabold">Enterprise Portal</p>
             </div>
         </div>
 
         <nav class="flex-1 px-4 py-6 space-y-2">
-            <button onclick="switchView('home')" id="nav-home" class="w-full flex items-center px-4 py-3 bg-kku-red/5 text-kku-red rounded-xl font-medium transition-colors border border-kku-red/10">
-                <i class="fa-solid fa-house w-6 text-center mr-2"></i> <span data-i18n="menu_dashboard">Dashboard</span>
+            <button onclick="app.switchView('home')" id="nav-home" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl font-semibold transition-all">
+                <i class="fa-solid fa-house w-6 text-center mr-2 text-base"></i> <span data-i18n="menu_dashboard">Dashboard</span>
             </button>
-            <button onclick="switchView('map')" id="nav-map" class="w-full flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl font-medium transition-colors">
-                <i class="fa-solid fa-map w-6 text-center mr-2"></i> <span data-i18n="menu_map">Campus Map</span>
+            <button onclick="app.switchView('map')" id="nav-map" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl font-semibold transition-all">
+                <i class="fa-solid fa-map w-6 text-center mr-2 text-base"></i> <span data-i18n="menu_map">Campus Map</span>
             </button>
-            <button onclick="switchView('history')" id="nav-history" class="w-full flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl font-medium transition-colors">
-                <i class="fa-solid fa-clock-rotate-left w-6 text-center mr-2"></i> <span data-i18n="menu_history">History Log</span>
+            <button onclick="app.switchView('history')" id="nav-history" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl font-semibold transition-all">
+                <i class="fa-solid fa-clock-rotate-left w-6 text-center mr-2 text-base"></i> <span data-i18n="menu_history">History Log</span>
             </button>
-            <button onclick="switchView('profile')" id="nav-profile" class="w-full flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl font-medium transition-colors">
-                <i class="fa-solid fa-user-gear w-6 text-center mr-2"></i> <span data-i18n="menu_profile">System Profile</span>
+            <button onclick="app.switchView('profile')" id="nav-profile" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl font-semibold transition-all">
+                <i class="fa-solid fa-user-gear w-6 text-center mr-2 text-base"></i> <span data-i18n="menu_profile">System Profile</span>
             </button>
         </nav>
 
-        <div class="p-4 border-t border-slate-100">
-            <div onclick="switchView('profile')" class="flex items-center px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 hover:border-slate-300 transition-colors cursor-pointer">
-                <div id="sidebar-avatar" class="w-8 h-8 rounded-full bg-kku-red text-white flex items-center justify-center font-bold text-sm mr-3 overflow-hidden">AD</div>
+        <div class="p-4 border-t border-theme">
+            <div onclick="app.switchView('profile')" class="flex items-center px-4 py-3 subtle-surface rounded-2xl border border-theme hover:border-theme-strong transition-all cursor-pointer shadow-sm">
+                <div id="sidebar-avatar" class="w-9 h-9 rounded-full btn-primary flex items-center justify-center font-bold text-sm mr-3 overflow-hidden shadow-sm">AD</div>
                 <div class="flex-1 overflow-hidden">
-                    <p id="sidebar-name" class="text-sm font-semibold text-slate-900 truncate">Administrator</p>
-                    <p id="sidebar-email" class="text-xs text-slate-500 truncate">admin@kku.ac.th</p>
+                    <p id="sidebar-name" class="text-sm font-bold text-main truncate">Administrator</p>
+                    <p id="sidebar-email" class="text-xs text-muted truncate">admin@kku.ac.th</p>
                 </div>
             </div>
         </div>
     </aside>
 
-    <!-- ================= MAIN CONTENT ================= -->
-    <main class="flex-1 h-full flex flex-col relative bg-slate-50/50 md:ml-64 pb-20 md:pb-0">
+    <!-- Main Content Area -->
+    <main class="flex-1 h-full flex flex-col relative app-bg md:ml-64 pb-20 md:pb-0">
         
         <!-- 1. HOME VIEW (Dashboard) -->
-        <div id="view-home" class="view-container view-active h-full flex flex-col w-full absolute inset-0 overflow-y-auto">
-            <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 sticky top-0 z-10">
-                <h2 class="text-lg md:text-xl font-bold text-slate-800" data-i18n="dash_title">Overview Dashboard</h2>
+        <div id="view-home" class="view-container h-full flex-col w-full absolute inset-0 overflow-y-auto">
+            <header class="h-20 glass-header flex items-center justify-between px-4 md:px-8 sticky top-0 z-20 shadow-sm">
+                <h2 class="text-lg md:text-xl font-bold text-main" data-i18n="dash_title">Overview Dashboard</h2>
                 <div class="w-64 md:w-96 relative group hidden sm:block">
-                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    <input type="text" placeholder="Search building name or lot ID..." class="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-full text-sm focus:outline-none" data-i18n-placeholder="search_placeholder">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-muted text-sm"></i>
+                    <input type="text" placeholder="Search building name or lot ID..." class="w-full pl-11 pr-4 py-2.5 subtle-surface border border-theme rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 text-main" data-i18n-placeholder="search_placeholder">
                 </div>
-                <div id="api-status" class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-200 bg-slate-50 text-xs font-medium text-slate-500">
-                    <span id="api-status-dot" class="w-2 h-2 rounded-full bg-slate-400 animate-pulse"></span>
+                <div id="api-status" class="flex items-center gap-2.5 px-3.5 py-2 rounded-full border border-theme subtle-surface text-xs font-semibold text-secondary shadow-sm">
+                    <span id="api-status-dot" class="w-2.5 h-2.5 rounded-full bg-slate-400 animate-pulse"></span>
                     <span id="api-status-text">Connecting...</span>
                 </div>
             </header>
 
-            <div class="p-4 md:p-8 max-w-7xl mx-auto w-full">
-                <div class="mb-8">
-                    <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4" data-i18n="realtime_capacity">Real-time Capacity</h3>
+            <div class="p-4 md:p-8 max-w-7xl mx-auto w-full space-y-8">
+                <div>
+                    <h3 class="text-xs font-bold text-muted uppercase tracking-wider mb-4" data-i18n="realtime_capacity">Real-time Capacity Overview</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-                        <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center">
-                            <div class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-lg md:text-xl mr-4 md:mr-5"><i class="fa-solid fa-car"></i></div>
-                            <div><p class="text-xs md:text-sm text-slate-500 font-medium" data-i18n="total_spaces">Total Spaces</p><p id="global-total" class="text-2xl md:text-3xl font-bold text-slate-800">50</p></div>
+                        <div class="card-surface p-6 rounded-3xl border border-theme shadow-sm flex items-center relative overflow-hidden group">
+                            <div class="w-14 h-14 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl mr-5 font-bold"><i class="fa-solid fa-car"></i></div>
+                            <div><p class="text-xs text-muted font-bold uppercase tracking-wider" data-i18n="total_spaces">Total Spaces</p><p id="global-total" class="text-3xl font-extrabold text-main mt-0.5">70</p></div>
+                            <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-blue-500/5 rounded-full pointer-events-none group-hover:scale-125 transition-transform"></div>
                         </div>
-                        <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center">
-                            <div class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg md:text-xl mr-4 md:mr-5 relative"><i class="fa-solid fa-circle-check"></i></div>
-                            <div><p class="text-xs md:text-sm text-slate-500 font-medium" data-i18n="available_spaces">Available</p><p id="global-available" class="text-2xl md:text-3xl font-bold text-available">50</p></div>
+                        <div class="card-surface p-6 rounded-3xl border border-theme shadow-sm flex items-center relative overflow-hidden group">
+                            <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl mr-5 font-bold"><i class="fa-solid fa-circle-check"></i></div>
+                            <div><p class="text-xs text-muted font-bold uppercase tracking-wider" data-i18n="available_spaces">Available Spaces</p><p id="global-available" class="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-0.5">70</p></div>
+                            <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-emerald-500/5 rounded-full pointer-events-none group-hover:scale-125 transition-transform"></div>
                         </div>
-                        <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center">
-                            <div class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-lg md:text-xl mr-4 md:mr-5"><i class="fa-solid fa-ban"></i></div>
-                            <div><p class="text-xs md:text-sm text-slate-500 font-medium" data-i18n="occupied_spaces">Occupied</p><p id="global-occupied" class="text-2xl md:text-3xl font-bold text-occupied">0</p></div>
+                        <div class="card-surface p-6 rounded-3xl border border-theme shadow-sm flex items-center relative overflow-hidden group">
+                            <div class="w-14 h-14 rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xl mr-5 font-bold"><i class="fa-solid fa-ban"></i></div>
+                            <div><p class="text-xs text-muted font-bold uppercase tracking-wider" data-i18n="occupied_spaces">Occupied Spaces</p><p id="global-occupied" class="text-3xl font-extrabold text-rose-600 dark:text-rose-400 mt-0.5">0</p></div>
+                            <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-rose-500/5 rounded-full pointer-events-none group-hover:scale-125 transition-transform"></div>
                         </div>
                     </div>
                 </div>
 
                 <div>
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider" data-i18n="managed_facilities">Managed Facilities</h3>
+                        <h3 class="text-xs font-bold text-muted uppercase tracking-wider" data-i18n="managed_facilities">Managed University Facilities</h3>
                     </div>
-                    <div id="buildings-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"></div>
+                    <div id="buildings-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6"></div>
                 </div>
             </div>
         </div>
 
         <!-- 2. CAMPUS MAP VIEW -->
-        <div id="view-map" class="view-container view-hidden h-full flex flex-col w-full absolute inset-0 bg-white">
-            <header class="h-20 bg-white border-b border-slate-200 flex items-center px-4 md:px-8 sticky top-0 z-10">
+        <div id="view-map" class="view-container h-full flex-col w-full absolute inset-0 card-surface">
+            <header class="h-20 glass-header flex items-center px-4 md:px-8 sticky top-0 z-20 shadow-sm">
                 <div>
-                    <h2 class="text-lg md:text-xl font-bold text-slate-800" data-i18n="map_title">Khon Kaen University Campus Map</h2>
-                    <p class="text-xs md:text-sm text-slate-500" data-i18n="map_sub">Interactive real-time building locations in KKU</p>
+                    <h2 class="text-lg md:text-xl font-bold text-main" data-i18n="map_title">Khon Kaen University Campus Map</h2>
+                    <p class="text-xs md:text-sm text-muted" data-i18n="map_sub">Interactive real-time building locations in KKU</p>
                 </div>
             </header>
-            <div class="flex-1 w-full p-3 md:p-6 bg-slate-50">
-                <div class="w-full h-full rounded-2xl border border-slate-200 shadow-sm overflow-hidden relative z-10" id="kku-leaflet-map"></div>
+            <div class="flex-1 w-full p-3 md:p-6 subtle-surface relative">
+                <div class="absolute top-8 right-8 z-[400] card-surface border border-theme p-4 rounded-2xl shadow-xl space-y-2.5 text-xs">
+                    <p class="font-bold text-main border-b border-theme pb-1.5 uppercase tracking-wider text-[10px]" data-i18n="legend_title">Map Legend</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-4 h-4 rounded-full btn-primary flex items-center justify-center text-white text-[9px]"><i class="fa-solid fa-location-dot"></i></div>
+                        <span class="text-secondary font-semibold" data-i18n="legend_building">Parking Building</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-3.5 h-3.5 rounded-full bg-emerald-500 shadow-sm"></div>
+                        <span class="text-secondary font-semibold" data-i18n="legend_avail">Available Spaces</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-3.5 h-3.5 rounded-full bg-rose-500 shadow-sm"></div>
+                        <span class="text-secondary font-semibold" data-i18n="legend_nav">Click Pin to View</span>
+                    </div>
+                </div>
+
+                <div class="w-full h-full rounded-3xl border border-theme shadow-md overflow-hidden relative z-0" id="kku-leaflet-map" style="min-height: 400px;"></div>
             </div>
         </div>
 
         <!-- 3. HISTORY LOG VIEW -->
-        <div id="view-history" class="view-container view-hidden h-full flex flex-col w-full absolute inset-0 overflow-y-auto bg-white">
-            <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 sticky top-0 z-10">
+        <div id="view-history" class="view-container h-full flex-col w-full absolute inset-0 overflow-y-auto card-surface">
+            <header class="h-20 glass-header flex items-center justify-between px-4 md:px-8 sticky top-0 z-20 shadow-sm">
                 <div>
-                    <h2 class="text-lg md:text-xl font-bold text-slate-800" data-i18n="history_title">System History & Analytics Log</h2>
-                    <p class="text-xs md:text-sm text-slate-500" data-i18n="history_sub">Real-time tracking of vehicle entry and parking occupancy analytics</p>
+                    <h2 class="text-lg md:text-xl font-bold text-main" data-i18n="history_title">System History & Analytics Log</h2>
+                    <p class="text-xs md:text-sm text-muted" data-i18n="history_sub">Real-time tracking of vehicle entry and parking occupancy analytics</p>
                 </div>
-                <button onclick="clearHistoryLogs()" class="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs md:text-sm font-bold transition-all">
-                    <i class="fa-solid fa-trash-can"></i> <span data-i18n="clear_logs_btn">Clear Logs</span>
+                <button onclick="app.parkingManager.clearLogs()" class="flex items-center gap-2 px-4 py-2.5 subtle-surface hover:opacity-80 text-main rounded-xl text-xs md:text-sm font-bold transition-all border border-theme shadow-sm">
+                    <i class="fa-solid fa-trash-can text-rose-500"></i> <span data-i18n="clear_logs_btn">Clear Logs</span>
                 </button>
             </header>
 
             <div class="p-4 md:p-8 max-w-7xl mx-auto w-full space-y-8">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-gradient-to-br from-rose-900 to-kku-red p-6 rounded-3xl text-white shadow-md flex flex-col justify-between">
-                        <div>
-                            <span class="px-3 py-1 bg-white/20 rounded-full text-[10px] font-bold tracking-wider uppercase">Analytics Highlight</span>
-                            <h3 class="text-lg font-bold mt-4" data-i18n="highest_occupancy">Highest Occupancy Zone</h3>
+                    <div class="btn-primary p-7 rounded-3xl shadow-lg flex flex-col justify-between relative overflow-hidden">
+                        <div class="relative z-10">
+                            <span class="px-3 py-1 bg-white/20 rounded-full text-[10px] font-extrabold tracking-wider uppercase">Analytics Highlight</span>
+                            <h3 class="text-base font-bold mt-4 opacity-90" data-i18n="highest_occupancy">Highest Occupancy Zone</h3>
                             <p id="analytics-top-building" class="text-2xl font-extrabold mt-1">Building A</p>
                         </div>
-                        <div class="mt-6 flex items-center gap-2 text-xs text-rose-100">
+                        <div class="mt-6 flex items-center gap-2 text-xs font-semibold opacity-90 relative z-10">
                             <i class="fa-solid fa-triangle-exclamation"></i> <span data-i18n="peak_demand">Peak parking demand detected</span>
                         </div>
+                        <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full pointer-events-none"></div>
                     </div>
 
-                    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm md:col-span-2 space-y-4">
+                    <div class="card-surface p-7 rounded-3xl border border-theme shadow-sm md:col-span-2 space-y-5">
                         <div class="flex justify-between items-center">
-                            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider" data-i18n="traffic_bars">Building Traffic & Occupancy Bars</h3>
-                            <span class="text-xs text-slate-400 font-medium">Live updating</span>
+                            <h3 class="font-bold text-main text-sm uppercase tracking-wider" data-i18n="traffic_bars">Building Traffic & Occupancy Bars</h3>
+                            <span class="text-xs text-muted font-semibold flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live updating</span>
                         </div>
-                        <div id="analytics-bars-container" class="space-y-3"></div>
+                        <div id="analytics-bars-container" class="space-y-4"></div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-                        <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider" data-i18n="recent_activities">Recent Activity Logs</h3>
-                        <span class="text-xs text-slate-400 font-medium">Showing latest events</span>
+                <div class="card-surface rounded-3xl border border-theme shadow-sm overflow-hidden">
+                    <div class="p-6 border-b border-theme flex justify-between items-center">
+                        <h3 class="font-bold text-main text-sm uppercase tracking-wider" data-i18n="recent_activities">Recent Activity Logs</h3>
+                        <span class="text-xs text-muted font-semibold">Showing latest events</span>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
-                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-400 uppercase text-[11px] font-bold tracking-wider">
+                                <tr class="subtle-surface border-b border-theme text-muted uppercase text-[11px] font-bold tracking-wider">
                                     <th class="py-4 px-6" data-i18n="th_time">Timestamp</th>
                                     <th class="py-4 px-6" data-i18n="th_building">Building / Zone</th>
                                     <th class="py-4 px-6" data-i18n="th_slot">Slot ID</th>
@@ -329,77 +330,73 @@
                                     <th class="py-4 px-6" data-i18n="th_source">Detection Source</th>
                                 </tr>
                             </thead>
-                            <tbody id="history-table-body" class="divide-y divide-slate-100 text-xs md:text-sm text-slate-600"></tbody>
+                            <tbody id="history-table-body" class="divide-y divide-theme text-xs md:text-sm text-secondary"></tbody>
                         </table>
                     </div>
-                    <div id="history-empty" class="p-12 text-center text-slate-400 hidden">
-                        <i class="fa-solid fa-clipboard-list text-4xl mb-3 text-slate-300"></i>
+                    <div id="history-empty" class="p-12 text-center text-muted hidden">
+                        <i class="fa-solid fa-clipboard-list text-4xl mb-3 text-muted"></i>
                         <p class="font-medium" data-i18n="no_logs">No activity logs recorded yet.</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 4. PROFILE & SETTINGS VIEW (ระบบเปลี่ยนภาษาและเปลี่ยนธีมสี) -->
-        <div id="view-profile" class="view-container view-hidden h-full flex flex-col w-full absolute inset-0 overflow-y-auto bg-white">
-            <header class="h-20 bg-white border-b border-slate-200 flex items-center px-4 md:px-8 sticky top-0 z-10">
-                <h2 class="text-lg md:text-xl font-bold text-slate-800" data-i18n="profile_title">System Profile & Settings</h2>
+        <!-- 4. PROFILE & SETTINGS VIEW -->
+        <div id="view-profile" class="view-container h-full flex-col w-full absolute inset-0 overflow-y-auto card-surface">
+            <header class="h-20 glass-header flex items-center px-4 md:px-8 sticky top-0 z-20 shadow-sm">
+                <h2 class="text-lg md:text-xl font-bold text-main" data-i18n="profile_title">System Profile & Settings</h2>
             </header>
             <div class="p-6 md:p-12 max-w-3xl mx-auto w-full space-y-6">
-                <!-- Profile Info Card -->
-                <div class="bg-white p-6 md:p-10 rounded-3xl border border-slate-200 shadow-sm space-y-8">
-                    <div class="flex items-center gap-6 pb-6 border-b border-slate-100">
-                        <div id="profile-avatar-box" class="w-20 h-20 rounded-2xl bg-kku-red text-white flex items-center justify-center font-bold text-3xl shadow-md overflow-hidden relative">
+                <div class="card-surface p-6 md:p-10 rounded-3xl border border-theme shadow-sm space-y-8">
+                    <div class="flex items-center gap-6 pb-6 border-b border-theme">
+                        <div id="profile-avatar-box" class="w-20 h-20 rounded-2xl btn-primary text-white flex items-center justify-center font-bold text-3xl shadow-lg overflow-hidden relative">
                             <span id="profile-avatar-text">AD</span>
                             <img id="profile-avatar-img" class="w-full h-full object-cover hidden" alt="Avatar">
                         </div>
                         <div>
-                            <h3 id="profile-display-name" class="font-bold text-xl text-slate-800">Administrator</h3>
-                            <p id="profile-display-email" class="text-sm text-slate-500">admin@kku.ac.th</p>
-                            <span class="inline-block mt-2 px-2.5 py-0.5 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold border border-emerald-100" data-i18n="owner_badge">System Owner</span>
+                            <h3 id="profile-display-name" class="font-extrabold text-xl text-main">Administrator</h3>
+                            <p id="profile-display-email" class="text-sm text-muted">admin@kku.ac.th</p>
+                            <span class="inline-block mt-2 px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full text-xs font-extrabold border border-emerald-500/20" data-i18n="owner_badge">System Owner</span>
                         </div>
                     </div>
 
-                    <!-- Settings & Preferences (Language & Theme) -->
                     <div class="space-y-6">
-                        <h4 class="font-bold text-sm text-slate-700 uppercase tracking-wider" data-i18n="settings_header">System Customization & Settings</h4>
+                        <h4 class="font-bold text-sm text-main uppercase tracking-wider" data-i18n="settings_header">System Customization & Settings</h4>
                         
-                        <!-- Language Selector -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                             <div>
-                                <label class="block text-xs font-bold text-slate-500 mb-2" data-i18n="lang_label">Language / ภาษา</label>
-                                <select id="select-lang" onchange="changeLanguage(this.value)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-kku-red">
+                                <label class="block text-xs font-bold text-muted mb-2 uppercase tracking-wide" data-i18n="lang_label">Language / ภาษา</label>
+                                <select id="select-lang" onchange="app.languageManager.changeLanguage(this.value)" class="w-full px-4 py-3 subtle-surface border border-theme rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30 text-main cursor-pointer">
                                     <option value="en">English (US)</option>
                                     <option value="th">ไทย (Thai)</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-500 mb-2" data-i18n="theme_label">Color Theme / ธีมสี</label>
-                                <select id="select-theme" onchange="changeTheme(this.value)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-kku-red">
-                                    <option value="red">KKU Red (อิฐขาว ดั้งเดิม)</option>
-                                    <option value="blue">Ocean Blue (ฟ้าขาว)</option>
-                                    <option value="dark">Dark Mode (ดาร์ก)</option>
+                                <label class="block text-xs font-bold text-muted mb-2 uppercase tracking-wide" data-i18n="theme_label">Color Theme / ธีมสี</label>
+                                <select id="select-theme" onchange="app.themeManager.changeTheme(this.value)" class="w-full px-4 py-3 subtle-surface border border-theme rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30 text-main cursor-pointer">
+                                    <option value="red">KKU Red (Modern Crimson)</option>
+                                    <option value="blue">Ocean Blue (Enterprise Blue)</option>
+                                    <option value="dark">Dark Mode (True Onyx Dark)</option>
                                 </select>
                             </div>
                         </div>
 
-                        <!-- Profile Edit Form -->
-                        <div class="space-y-4 pt-4 border-t border-slate-100">
-                            <h4 class="font-bold text-sm text-slate-700 uppercase tracking-wider" data-i18n="edit_profile">Edit Profile Information</h4>
+                        <div class="space-y-5 pt-6 border-t border-theme">
+                            <h4 class="font-bold text-sm text-main uppercase tracking-wider" data-i18n="edit_profile">Edit Profile Information</h4>
                             <div>
-                                <label class="block text-xs font-bold text-slate-500 mb-1" data-i18n="name_label">Full Name</label>
-                                <input type="text" id="input-name" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-kku-red" placeholder="Enter your name">
+                                <label class="block text-xs font-bold text-muted mb-1.5 uppercase tracking-wide" data-i18n="name_label">Full Name</label>
+                                <input type="text" id="input-name" class="w-full px-4 py-3 subtle-surface border border-theme rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 text-main" placeholder="Enter your name">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-500 mb-1" data-i18n="email_label">Email Address</label>
-                                <input type="email" id="input-email" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-kku-red" placeholder="Enter your email">
+                                <label class="block text-xs font-bold text-muted mb-1.5 uppercase tracking-wide" data-i18n="email_label">Email Address</label>
+                                <input type="email" id="input-email" class="w-full px-4 py-3 subtle-surface border border-theme rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 text-main" placeholder="Enter your email">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-500 mb-1" data-i18n="img_label">Profile Image URL</label>
-                                <input type="text" id="input-img" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-kku-red" placeholder="https://example.com/avatar.jpg">
+                                <label class="block text-xs font-bold text-muted mb-1.5 uppercase tracking-wide" data-i18n="upload_label">Upload Profile Image</label>
+                                <input type="file" id="input-file" accept="image/*" onchange="app.profileManager.handleImageUpload(event)" class="w-full px-4 py-2.5 subtle-surface border border-theme rounded-xl text-xs text-muted file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-light file:text-primary-theme hover:file:opacity-90 cursor-pointer">
                             </div>
                             <div class="pt-2">
-                                <button onclick="saveProfileChanges()" class="w-full py-3 bg-kku-red hover:bg-kku-red-dark text-white font-bold rounded-xl shadow-sm transition-all text-sm" data-i18n="save_btn">
+                                <button onclick="app.profileManager.saveChanges()" class="w-full py-3.5 btn-primary font-bold rounded-xl shadow-md transition-all text-sm tracking-wide" data-i18n="save_btn">
                                     <i class="fa-solid fa-floppy-disk mr-2"></i> Save Changes
                                 </button>
                             </div>
@@ -410,42 +407,42 @@
         </div>
 
         <!-- 5. DETAIL VIEW (Single Building Layout) -->
-        <div id="view-detail" class="view-container view-hidden h-full flex flex-col w-full absolute inset-0 overflow-y-auto bg-white">
-            <header class="h-20 bg-white border-b border-slate-200 flex items-center px-4 md:px-8 sticky top-0 z-10">
-                <button onclick="navigateBack()" class="w-10 h-10 flex items-center justify-center bg-slate-50 border border-slate-200 rounded-xl text-slate-600 hover:text-kku-red mr-4"><i class="fa-solid fa-arrow-left"></i></button>
+        <div id="view-detail" class="view-container h-full flex-col w-full absolute inset-0 overflow-y-auto card-surface">
+            <header class="h-20 glass-header flex items-center px-4 md:px-8 sticky top-0 z-20 shadow-sm">
+                <button onclick="app.switchView('home')" class="w-10 h-10 flex items-center justify-center subtle-surface border border-theme rounded-xl text-main hover:text-primary-theme mr-4 transition-colors"><i class="fa-solid fa-arrow-left"></i></button>
                 <div>
-                    <h2 id="detail-building-name" class="text-base md:text-xl font-bold text-slate-800">Building Name</h2>
-                    <p id="detail-building-desc" class="text-xs md:text-sm text-slate-500">Location description</p>
+                    <h2 id="detail-building-name" class="text-base md:text-xl font-bold text-main">Building Name</h2>
+                    <p id="detail-building-desc" class="text-xs md:text-sm text-muted">Location description</p>
                 </div>
-                <div class="ml-auto flex items-center gap-2 md:gap-3">
-                    <button onclick="openNavigationForActiveBuilding()" class="flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs md:text-sm font-bold shadow-sm transition-all">
+                <div class="ml-auto flex items-center gap-2.5 md:gap-3.5">
+                    <button onclick="app.mapManager.openNavigationForActiveBuilding()" class="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs md:text-sm font-bold shadow-md transition-all">
                         <i class="fa-solid fa-diamond-turn-right"></i> <span data-i18n="nav_button">Navigate</span>
                     </button>
                     <div class="hidden sm:flex gap-3">
-                        <div class="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-bold border border-emerald-100"><span data-i18n="detail_available">Available</span>: <span id="detail-av-count">10</span></div>
-                        <div class="px-4 py-2 bg-red-50 text-red-700 rounded-lg text-sm font-bold border border-red-100"><span data-i18n="detail_occupied">Occupied</span>: <span id="detail-occ-count">0</span></div>
+                        <div class="px-4 py-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl text-sm font-bold border border-emerald-500/20"><span data-i18n="detail_available">Available</span>: <span id="detail-av-count">10</span></div>
+                        <div class="px-4 py-2 bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-xl text-sm font-bold border border-rose-500/20"><span data-i18n="detail_occupied">Occupied</span>: <span id="detail-occ-count">0</span></div>
                     </div>
                 </div>
             </header>
 
-            <div class="p-4 md:p-8 flex-1 flex flex-col items-center justify-center bg-slate-50/50">
-                <div class="w-full max-w-4xl bg-white p-5 md:p-10 rounded-3xl border border-slate-200 shadow-sm relative">
+            <div class="p-4 md:p-8 flex-1 flex flex-col items-center justify-center subtle-surface">
+                <div class="w-full max-w-4xl card-surface p-6 md:p-10 rounded-3xl border border-theme shadow-xl relative">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 md:mb-8">
                         <div>
-                            <h3 class="font-bold text-base md:text-lg text-slate-800" data-i18n="floor_plan">Ground Floor Plan</h3>
-                            <p class="text-xs md:text-sm text-slate-500" data-i18n="floor_sub">Click a slot to toggle its status manually for testing.</p>
+                            <h3 class="font-bold text-base md:text-lg text-main" data-i18n="floor_plan">Ground Floor Plan</h3>
+                            <p class="text-xs md:text-sm text-muted" data-i18n="floor_sub">Click a slot to toggle its status manually for testing.</p>
                         </div>
-                        <div class="flex items-center text-xs md:text-sm font-semibold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
+                        <div class="flex items-center text-xs md:text-sm font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3.5 py-1.5 rounded-full border border-emerald-500/20 shadow-sm">
                             <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span> <span data-i18n="live_sensors">Live Sensors Active</span>
                         </div>
                     </div>
 
-                    <div class="relative bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 md:p-8 overflow-x-auto">
+                    <div class="relative subtle-surface border-2 border-theme rounded-2xl p-4 md:p-8 overflow-x-auto shadow-inner">
                         <div id="slots-top" class="grid grid-cols-5 gap-3 md:gap-6 mb-12 min-w-[500px]"></div>
-                        <div class="flex items-center justify-between text-slate-400 font-bold uppercase tracking-widest px-4 absolute left-0 right-0 top-1/2 -translate-y-1/2 min-w-[500px]">
-                            <div class="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded text-xs">ENTRY</div>
-                            <div class="flex-1 flex justify-center gap-4 px-8"><div class="w-6 h-1.5 bg-slate-300 rounded-full"></div><div class="w-6 h-1.5 bg-slate-300 rounded-full"></div></div>
-                            <div class="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded text-xs">EXIT</div>
+                        <div class="flex items-center justify-between text-muted font-bold uppercase tracking-widest px-4 absolute left-0 right-0 top-1/2 -translate-y-1/2 min-w-[500px]">
+                            <div class="flex items-center gap-2 subtle-surface px-3 py-1 rounded-lg text-xs border border-theme shadow-sm">ENTRY</div>
+                            <div class="flex-1 flex justify-center gap-4 px-8"><div class="w-8 h-1.5 bg-border-strong rounded-full"></div><div class="w-8 h-1.5 bg-border-strong rounded-full"></div></div>
+                            <div class="flex items-center gap-2 subtle-surface px-3 py-1 rounded-lg text-xs border border-theme shadow-sm">EXIT</div>
                         </div>
                         <div id="slots-bottom" class="grid grid-cols-5 gap-3 md:gap-6 mt-12 min-w-[500px]"></div>
                     </div>
@@ -454,584 +451,619 @@
         </div>
     </main>
 
-    <!-- ================= BOTTOM NAVIGATION (มือถือ) ================= -->
-    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-10px_25px_rgba(0,0,0,0.05)] rounded-t-2xl z-50">
+    <!-- Mobile Bottom Navigation -->
+    <nav class="md:hidden fixed bottom-0 left-0 w-full card-surface backdrop-blur-xl border-t border-theme shadow-2xl rounded-t-3xl z-40">
         <div class="flex justify-around items-center h-20 px-2">
-            <button onclick="switchView('home')" id="mob-home" class="flex flex-col items-center justify-center w-full text-kku-red">
+            <button onclick="app.switchView('home')" id="mob-home" class="mob-btn flex flex-col items-center justify-center w-full text-muted py-2 transition-all">
                 <i class="fa-solid fa-house text-xl mb-1"></i><span class="text-[10px] font-bold" data-i18n="menu_dashboard">Dashboard</span>
             </button>
-            <button onclick="switchView('map')" id="mob-map" class="flex flex-col items-center justify-center w-full text-slate-400 hover:text-kku-red">
+            <button onclick="app.switchView('map')" id="mob-map" class="mob-btn flex flex-col items-center justify-center w-full text-muted py-2 transition-all">
                 <i class="fa-solid fa-map text-xl mb-1"></i><span class="text-[10px] font-medium" data-i18n="menu_map">Map</span>
             </button>
-            <button onclick="switchView('history')" id="mob-history" class="flex flex-col items-center justify-center w-full text-slate-400 hover:text-kku-red">
+            <button onclick="app.switchView('history')" id="mob-history" class="mob-btn flex flex-col items-center justify-center w-full text-muted py-2 transition-all">
                 <i class="fa-solid fa-clock-rotate-left text-xl mb-1"></i><span class="text-[10px] font-medium" data-i18n="menu_history">History</span>
             </button>
-            <button onclick="switchView('profile')" id="mob-profile" class="flex flex-col items-center justify-center w-full text-slate-400 hover:text-kku-red">
+            <button onclick="app.switchView('profile')" id="mob-profile" class="mob-btn flex flex-col items-center justify-center w-full text-muted py-2 transition-all">
                 <i class="fa-solid fa-user-gear text-xl mb-1"></i><span class="text-[10px] font-medium" data-i18n="menu_profile">Profile</span>
             </button>
         </div>
     </nav>
 
     <script>
-        const buildingsData = [
-            { id: 'A', name: 'Building A', desc: 'Engineer building', lat: 16.4745, lng: 102.8225, total: 10, slots: Array(10).fill(true) },
-            { id: 'B', name: 'Building B', desc: 'Science building', lat: 16.4720, lng: 102.8240, total: 10, slots: Array(10).fill(true) },
-            { id: 'C', name: 'Building C', desc: 'Business building', lat: 16.4690, lng: 102.8210, total: 10, slots: Array(10).fill(true) },
-            { id: 'D', name: 'Building D', desc: 'Humanity building', lat: 16.4760, lng: 102.8190, total: 10, slots: Array(10).fill(true) },
-            { id: 'E', name: 'Building E', desc: 'Library building', lat: 16.4735, lng: 102.8165, total: 10, slots: Array(10).fill(true) }
-        ];
+        /**
+         * Custom Toast Notification (replaces native alert)
+         */
+        function showToast(message, type = 'success') {
+            const existing = document.getElementById('custom-toast');
+            if (existing) existing.remove();
 
-        let currentActiveBuilding = null;
-        let kkuMap = null;
-        let mapInitialized = false;
-        let historyLogs = [];
-        
-        let userProfile = {
-            name: localStorage.getItem('kku_p_name') || 'Administrator',
-            email: localStorage.getItem('kku_p_email') || 'admin@kku.ac.th',
-            imgUrl: localStorage.getItem('kku_p_img') || ''
-        };
+            const toast = document.createElement('div');
+            toast.id = 'custom-toast';
+            toast.className = `fixed top-6 right-6 z-50 px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-sm font-bold text-white transition-all transform translate-y-[-20px] opacity-0 ${type === 'success' ? 'bg-emerald-600' : 'bg-rose-600'}`;
+            toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'} text-lg"></i><span>${message}</span>`;
+            document.body.appendChild(toast);
 
-        // ระบบภาษา (TH / EN)
-        let currentLang = localStorage.getItem('kku_lang') || 'en';
-        const translations = {
-            en: {
-                menu_dashboard: "Dashboard", menu_map: "Campus Map", menu_history: "History Log", menu_profile: "System Profile",
-                dash_title: "Overview Dashboard", search_placeholder: "Search building name or lot ID...",
-                realtime_capacity: "Real-time Capacity", total_spaces: "Total Spaces", available_spaces: "Available", occupied_spaces: "Occupied",
-                managed_facilities: "Managed Facilities", map_title: "Khon Kaen University Campus Map", map_sub: "Interactive real-time building locations in KKU",
-                history_title: "System History & Analytics Log", history_sub: "Real-time tracking of vehicle entry and parking occupancy analytics",
-                clear_logs_btn: "Clear Logs", highest_occupancy: "Highest Occupancy Zone", peak_demand: "Peak parking demand detected",
-                traffic_bars: "Building Traffic & Occupancy Bars", recent_activities: "Recent Activity Logs",
-                th_time: "Timestamp", th_building: "Building / Zone", th_slot: "Slot ID", th_status: "Status Event", th_source: "Detection Source",
-                no_logs: "No activity logs recorded yet.", profile_title: "System Profile & Settings", owner_badge: "System Owner",
-                settings_header: "System Customization & Settings", lang_label: "Language / ภาษา", theme_label: "Color Theme / ธีมสี",
-                edit_profile: "Edit Profile Information", name_label: "Full Name", email_label: "Email Address", img_label: "Profile Image URL",
-                save_btn: "Save Changes", nav_button: "Navigate", detail_available: "Available", detail_occupied: "Occupied",
-                floor_plan: "Ground Floor Plan", floor_sub: "Click a slot to toggle its status manually for testing.", live_sensors: "Live Sensors Active",
-                nav_sub: "Live Traffic & Estimated Time", eta_label: "Estimated Arrival", traffic_label: "Traffic Status",
-                nav_desc: "System will launch Google Maps with turn-by-turn driving directions.", cancel_btn: "Cancel", start_maps_btn: "Start Maps"
-            },
-            th: {
-                menu_dashboard: "หน้าหลัก", menu_map: "แผนที่มข.", menu_history: "ประวัติการทำงาน", menu_profile: "ตั้งค่าโปรไฟล์",
-                dash_title: "แดชบอร์ดภาพรวม", search_placeholder: "ค้นหาชื่อตึกหรือช่องจอด...",
-                realtime_capacity: "สถานะที่จอดรถแบบเรียลไทม์", total_spaces: "ช่องจอดทั้งหมด", available_spaces: "ว่าง", occupied_spaces: "ไม่ว่าง",
-                managed_facilities: "อาคารที่ดูแล", map_title: "แผนภูมิตำแหน่งอาคาร มหาวิทยาลัยขอนแก่น", map_sub: "แผนที่แสดงตำแหน่งอาคารและสถานะที่จอดรถใน มข.",
-                history_title: "ประวัติระบบและการวิเคราะห์", history_sub: "ติดตามข้อมูลรถเข้า-ออกและการใช้งานลานจอดรถย้อนหลังแบบเรียลไทม์",
-                clear_logs_btn: "ล้างประวัติ", highest_occupancy: "โซนที่มีรถจอดหนาแน่นที่สุด", peak_demand: "ตรวจพบความต้องการจอดรถสูงสุด",
-                traffic_bars: "กราฟแสดงอัตราความหนาแน่นรายอาคาร", recent_activities: "บันทึกเหตุการณ์ล่าสุด",
-                th_time: "เวลา", th_building: "อาคาร / โซน", th_slot: "หมายเลขช่อง", th_status: "สถานะ", th_source: "แหล่งที่มา",
-                no_logs: "ยังไม่มีประวัติบันทึกการใช้งานในระบบ", profile_title: "โปรไฟล์ระบบและการตั้งค่า", owner_badge: "ผู้ดูแลระบบสูงสุด",
-                settings_header: "การปรับแต่งระบบและตั้งค่า", lang_label: "ภาษา / Language", theme_label: "ธีมสี / Color Theme",
-                edit_profile: "แก้ไขข้อมูลส่วนตัว", name_label: "ชื่อ - นามสกุล", email_label: "อีเมล", img_label: "ลิงก์รูปโปรไฟล์ (URL)",
-                save_btn: "บันทึกการเปลี่ยนแปลง", nav_button: "นำทาง", detail_available: "ว่าง", detail_occupied: "ไม่ว่าง",
-                floor_plan: "แผนผังชั้นล่าง (Ground Floor)", floor_sub: "คลิกที่ช่องจอดเพื่อเปลี่ยนสถานะจำลองการทดสอบ", live_sensors: "เซนเซอร์กล้องทำงานปกติ",
-                nav_sub: "สภาพการจราจรและเวลาโดยประมาณ", eta_label: "เวลาถึงโดยประมาณ", traffic_label: "การจราจร",
-                nav_desc: "ระบบจะเปิด Google Maps เพื่อนำทางไปยังอาคารดังกล่าวทันที", cancel_btn: "ยกเลิก", start_maps_btn: "เริ่มนำทาง"
-            }
-        };
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-[-20px]', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+            });
 
-        const API_URL = 'https://anthill-husband-unwatched.ngrok-free.dev/api/status';
-
-        document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
-                const splash = document.getElementById('splash-screen');
-                splash.classList.add('fade-out');
-                setTimeout(() => splash.remove(), 600);
-            }, 1500);
-
-            applyTheme(localStorage.getItem('kku_theme') || 'red');
-            applyLanguage(currentLang);
-            renderDashboard();
-            startApiPolling();
-            addInitialLogs();
-            loadProfileData();
-            updateAnalyticsDashboard();
-        });
-
-        // ==========================================
-        // LANGUAGE & THEME SYSTEM (เปลี่ยนภาษาและธีมสี)
-        // ==========================================
-        function changeLanguage(lang) {
-            currentLang = lang;
-            localStorage.setItem('kku_lang', lang);
-            applyLanguage(lang);
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-[-20px]', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
         }
 
-        function applyLanguage(lang) {
-            document.getElementById('select-lang').value = lang;
-            const elements = document.querySelectorAll('[data-i18n]');
-            elements.forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (translations[lang][key]) {
-                    el.textContent = translations[lang][key];
-                }
-            });
-
-            const placeholders = document.querySelectorAll('[data-i18n-placeholder]');
-            placeholders.forEach(el => {
-                const key = el.getAttribute('data-i18n-placeholder');
-                if (translations[lang][key]) {
-                    el.placeholder = translations[lang][key];
-                }
-            });
-        }
-
-        function changeTheme(themeName) {
-            localStorage.setItem('kku_theme', themeName);
-            location.reload(); // รีโหลดเพื่ออัปเดตสี Tailwind Config ใหม่อย่างสมบูรณ์
-        }
-
-        function applyTheme(themeName) {
-            document.getElementById('select-theme').value = themeName;
-            if (themeName === 'dark') {
-                document.body.classList.add('theme-dark');
-            } else {
-                document.body.classList.remove('theme-dark');
-            }
-        }
-
-        // ==========================================
-        // NAVIGATION MODAL & TIME ESTIMATION
-        // ==========================================
-        function openGoogleMapsNavigation(lat, lng, buildingName) {
-            const modal = document.getElementById('nav-modal');
-            const modalContent = document.getElementById('nav-modal-content');
-            const titleEl = document.getElementById('nav-modal-title');
-            const etaEl = document.getElementById('nav-eta');
-            const trafficBadge = document.getElementById('nav-traffic-badge');
-            const trafficBar = document.getElementById('nav-traffic-bar');
-            const confirmBtn = document.getElementById('nav-confirm-btn');
-
-            titleEl.textContent = buildingName ? `Navigate to ${buildingName}` : 'Navigate to Parking Lot';
-            const randomMins = Math.floor(Math.random() * 5) + 3;
-            etaEl.textContent = `${randomMins} - ${randomMins + 3} mins`;
-
-            const traffics = [
-                { text: 'Normal Flow (Green)', color: 'bg-emerald-100 text-emerald-700', dot: 'bg-emerald-500', width: 'w-1/3' },
-                { text: 'Moderate Traffic (Orange)', color: 'bg-amber-100 text-amber-700', dot: 'bg-amber-500', width: 'w-2/3' },
-                { text: 'Heavy Congestion (Red)', color: 'bg-rose-100 text-rose-700', dot: 'bg-rose-500', width: 'w-full' }
-            ];
-            const selectedTraffic = traffics[Math.floor(Math.random() * traffics.length)];
-
-            trafficBadge.className = `px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 ${selectedTraffic.color}`;
-            trafficBadge.innerHTML = `<span class="w-2 h-2 rounded-full ${selectedTraffic.dot} animate-pulse"></span> ${selectedTraffic.text}`;
-            trafficBar.className = `h-full transition-all duration-500 ${selectedTraffic.dot} ${selectedTraffic.width}`;
-
-            confirmBtn.onclick = () => {
-                const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
-                window.open(url, '_blank');
-                closeNavModal();
-            };
-
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                modalContent.classList.remove('scale-95');
-            }, 10);
-        }
-
-        function closeNavModal() {
-            const modal = document.getElementById('nav-modal');
-            const modalContent = document.getElementById('nav-modal-content');
-            modal.classList.add('opacity-0');
-            modalContent.classList.add('scale-95');
-            setTimeout(() => { modal.classList.add('hidden'); }, 300);
-        }
-
-        function openNavigationForActiveBuilding() {
-            if (currentActiveBuilding) {
-                openGoogleMapsNavigation(currentActiveBuilding.lat, currentActiveBuilding.lng, currentActiveBuilding.name);
-            }
-        }
-
-        // ==========================================
-        // ANALYTICS & SUMMARY DASHBOARD
-        // ==========================================
-        function updateAnalyticsDashboard() {
-            const container = document.getElementById('analytics-bars-container');
-            const topBuildingEl = document.getElementById('analytics-top-building');
-            container.innerHTML = '';
-
-            let maxOccupied = -1;
-            let topBuildingName = 'Building A';
-
-            buildingsData.forEach(b => {
-                const stats = getBuildingStats(b);
-                if (stats.occupied > maxOccupied) {
-                    maxOccupied = stats.occupied;
-                    topBuildingName = b.name;
-                }
-
-                const occPercent = 100 - stats.percentage;
-                const barColor = occPercent > 70 ? 'bg-rose-500' : (occPercent > 40 ? 'bg-amber-500' : 'bg-emerald-500');
-
-                const row = document.createElement('div');
-                row.className = "space-y-1";
-                row.innerHTML = `
-                    <div class="flex justify-between text-xs font-bold text-slate-700">
-                        <span>${b.name} (${b.desc})</span>
-                        <span>${stats.occupied} / ${b.total} Occupied (${occPercent.toFixed(0)}%)</span>
-                    </div>
-                    <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                        <div class="h-full rounded-full transition-all duration-500 ${barColor}" style="width: ${occPercent}%"></div>
-                    </div>
-                `;
-                container.appendChild(row);
-            });
-
-            topBuildingEl.textContent = `${topBuildingName} (${maxOccupied} Vehicles)`;
-        }
-
-        // ==========================================
-        // PROFILE SYSTEM
-        // ==========================================
-        function loadProfileData() {
-            document.getElementById('sidebar-name').textContent = userProfile.name;
-            document.getElementById('sidebar-email').textContent = userProfile.email;
-            document.getElementById('profile-display-name').textContent = userProfile.name;
-            document.getElementById('profile-display-email').textContent = userProfile.email;
-
-            document.getElementById('input-name').value = userProfile.name;
-            document.getElementById('input-email').value = userProfile.email;
-            document.getElementById('input-img').value = userProfile.imgUrl;
-
-            updateAvatarDisplay();
-        }
-
-        function updateAvatarDisplay() {
-            const sidebarAvatar = document.getElementById('sidebar-avatar');
-            const profileText = document.getElementById('profile-avatar-text');
-            const profileImg = document.getElementById('profile-avatar-img');
-            const initials = userProfile.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'AD';
-
-            if (userProfile.imgUrl && userProfile.imgUrl.startsWith('http')) {
-                sidebarAvatar.innerHTML = `<img src="${userProfile.imgUrl}" class="w-full h-full object-cover" alt="Avatar">`;
-            } else {
-                sidebarAvatar.innerHTML = `<span id="sidebar-avatar-text">${initials}</span>`;
-            }
-        }
-
-        function saveProfileChanges() {
-            const newName = document.getElementById('input-name').value.trim();
-            const newEmail = document.getElementById('input-email').value.trim();
-            const newImg = document.getElementById('input-img').value.trim();
-
-            if (!newName) { alert('Please enter a valid name.'); return; }
-
-            userProfile.name = newName;
-            userProfile.email = newEmail || 'admin@kku.ac.th';
-            userProfile.imgUrl = newImg;
-
-            localStorage.setItem('kku_p_name', userProfile.name);
-            localStorage.setItem('kku_p_email', userProfile.email);
-            localStorage.setItem('kku_p_img', userProfile.imgUrl);
-
-            loadProfileData();
-            alert('Profile and settings updated successfully!');
-        }
-
-        // ==========================================
-        // HISTORY & VIEW SWITCHING SYSTEM
-        // ==========================================
-        function addInitialLogs() {
-            const now = new Date();
-            historyLogs.unshift({
-                time: now.toLocaleTimeString(),
-                building: 'Building A',
-                slot: 'A-01',
-                status: 'Available',
-                source: 'System Initialization'
-            });
-            renderHistoryTable();
-        }
-
-        function logActivity(buildingName, slotId, isAvailable, source) {
-            const now = new Date();
-            const timeStr = `${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
-            historyLogs.unshift({
-                time: timeStr,
-                building: buildingName,
-                slot: slotId,
-                status: isAvailable ? 'Available (Open)' : 'Occupied (Full)',
-                source: source
-            });
-            if (historyLogs.length > 50) historyLogs.pop();
-            renderHistoryTable();
-            updateAnalyticsDashboard();
-        }
-
-        function renderHistoryTable() {
-            const tbody = document.getElementById('history-table-body');
-            const emptyEl = document.getElementById('history-empty');
-            tbody.innerHTML = '';
-
-            if (historyLogs.length === 0) {
-                emptyEl.classList.remove('hidden');
-                return;
-            } else {
-                emptyEl.classList.add('hidden');
+        /**
+         * ThemeManager Class: Manages KKU Red, Ocean Blue, and True Dark Mode with CSS variables.
+         */
+        class ThemeManager {
+            constructor() {
+                this.currentTheme = localStorage.getItem('kku_theme') || 'red';
             }
 
-            historyLogs.forEach(log => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50/80 transition-colors";
-                const badgeColor = log.status.includes('Available') ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-red-50 text-red-700 border-red-100';
+            init() {
+                this.apply(this.currentTheme);
+            }
+
+            apply(themeName) {
+                this.currentTheme = themeName;
+                localStorage.setItem('kku_theme', themeName);
                 
-                tr.innerHTML = `
-                    <td class="py-4 px-6 font-medium text-slate-500">${log.time}</td>
-                    <td class="py-4 px-6 font-bold text-slate-800">${log.building}</td>
-                    <td class="py-4 px-6 font-semibold text-slate-700">${log.slot}</td>
-                    <td class="py-4 px-6"><span class="px-2.5 py-1 rounded-md text-xs font-bold border ${badgeColor}">${log.status}</span></td>
-                    <td class="py-4 px-6 text-slate-500 font-medium">${log.source}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
+                document.body.classList.remove('theme-dark', 'theme-blue', 'theme-red');
+                const themeSelect = document.getElementById('select-theme');
+                if (themeSelect) themeSelect.value = themeName;
 
-        function clearHistoryLogs() {
-            historyLogs = [];
-            renderHistoryTable();
-        }
-
-        function switchView(viewName) {
-            const views = ['home', 'map', 'history', 'profile', 'detail'];
-            views.forEach(v => {
-                const el = document.getElementById(`view-${v}`);
-                if (el) {
-                    if (v === viewName) {
-                        el.classList.replace('view-hidden', 'view-active');
-                    } else {
-                        el.classList.replace('view-active', 'view-hidden');
-                    }
-                }
-            });
-
-            ['home', 'map', 'history', 'profile'].forEach(m => {
-                const navBtn = document.getElementById(`nav-${m}`);
-                const mobBtn = document.getElementById(`mob-${m}`);
-                if(m === viewName) {
-                    if(navBtn) navBtn.className = "w-full flex items-center px-4 py-3 bg-kku-red/5 text-kku-red rounded-xl font-medium transition-colors border border-kku-red/10";
-                    if(mobBtn) mobBtn.className = "flex flex-col items-center justify-center w-full text-kku-red";
+                if (themeName === 'dark') {
+                    document.body.classList.add('theme-dark');
+                } else if (themeName === 'blue') {
+                    document.body.classList.add('theme-blue');
                 } else {
-                    if(navBtn) navBtn.className = "w-full flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl font-medium transition-colors";
-                    if(mobBtn) mobBtn.className = "flex flex-col items-center justify-center w-full text-slate-400 hover:text-kku-red";
+                    document.body.classList.add('theme-red');
                 }
-            });
+            }
 
-            if(viewName === 'map') { setTimeout(() => { initKKUMap(); }, 250); }
-            if(viewName === 'history') { updateAnalyticsDashboard(); }
+            changeTheme(themeName) {
+                this.apply(themeName);
+            }
         }
 
-        function initKKUMap() {
-            if (!mapInitialized) {
-                kkuMap = L.map('kku-leaflet-map').setView([16.4735, 102.8210], 15);
+        /**
+         * LanguageManager Class: Handles multi-language internationalization (EN/TH).
+         */
+        class LanguageManager {
+            constructor() {
+                this.currentLang = localStorage.getItem('kku_lang') || 'en';
+                this.translations = {
+                    en: {
+                        menu_dashboard: "Dashboard", menu_map: "Campus Map", menu_history: "History Log", menu_profile: "System Profile",
+                        dash_title: "Overview Dashboard", search_placeholder: "Search building name or lot ID...",
+                        realtime_capacity: "Real-time Capacity Overview", total_spaces: "Total Spaces", available_spaces: "Available Spaces", occupied_spaces: "Occupied Spaces",
+                        managed_facilities: "Managed University Facilities", map_title: "Khon Kaen University Campus Map", map_sub: "Interactive real-time building locations in KKU",
+                        history_title: "System History & Analytics Log", history_sub: "Real-time tracking of vehicle entry and parking occupancy analytics",
+                        clear_logs_btn: "Clear Logs", highest_occupancy: "Highest Occupancy Zone", peak_demand: "Peak parking demand detected",
+                        traffic_bars: "Building Traffic & Occupancy Bars", recent_activities: "Recent Activity Logs",
+                        th_time: "Timestamp", th_building: "Building / Zone", th_slot: "Slot ID", th_status: "Status Event", th_source: "Detection Source",
+                        no_logs: "No activity logs recorded yet.", profile_title: "System Profile & Settings", owner_badge: "System Owner",
+                        settings_header: "System Customization & Settings", lang_label: "Language / ภาษา", theme_label: "Color Theme / ธีมสี",
+                        edit_profile: "Edit Profile Information", name_label: "Full Name", email_label: "Email Address", upload_label: "Upload Profile Image",
+                        save_btn: "Save Changes", nav_button: "Navigate", detail_available: "Available", detail_occupied: "Occupied",
+                        floor_plan: "Ground Floor Plan", floor_sub: "Click a slot to toggle its status manually for testing.", live_sensors: "Live Sensors Active",
+                        legend_title: "Map Legend", legend_building: "Parking Building", legend_avail: "Available Spaces", legend_nav: "Click Pin to View"
+                    },
+                    th: {
+                        menu_dashboard: "หน้าหลัก", menu_map: "แผนที่มข.", menu_history: "ประวัติการทำงาน", menu_profile: "ตั้งค่าโปรไฟล์",
+                        dash_title: "แดชบอร์ดภาพรวม", search_placeholder: "ค้นหาชื่อตึกหรือช่องจอด...",
+                        realtime_capacity: "สถานะความจุที่จอดรถเรียลไทม์", total_spaces: "ช่องจอดทั้งหมด", available_spaces: "ช่องจอดว่าง", occupied_spaces: "ช่องจอดไม่ว่าง",
+                        managed_facilities: "อาคารและลานจอดรถในความดูแล", map_title: "แผนภูมิตำแหน่งอาคาร มหาวิทยาลัยขอนแก่น", map_sub: "แผนที่แสดงตำแหน่งอาคารและสถานะที่จอดรถใน มข.",
+                        history_title: "ประวัติระบบและการวิเคราะห์", history_sub: "ติดตามข้อมูลรถเข้า-ออกและการใช้งานลานจอดรถย้อนหลังแบบเรียลไทม์",
+                        clear_logs_btn: "ล้างประวัติ", highest_occupancy: "โซนที่มีรถจอดหนาแน่นที่สุด", peak_demand: "ตรวจพบความต้องการจอดรถสูงสุด",
+                        traffic_bars: "กราฟแสดงอัตราความหนาแน่นรายอาคาร", recent_activities: "บันทึกเหตุการณ์ล่าสุด",
+                        th_time: "เวลา", th_building: "อาคาร / โซน", th_slot: "หมายเลขช่อง", th_status: "สถานะ", th_source: "แหล่งที่มา",
+                        no_logs: "ยังไม่มีประวัติบันทึกการใช้งานในระบบ", profile_title: "โปรไฟล์ระบบและการตั้งค่า", owner_badge: "ผู้ดูแลระบบสูงสุด",
+                        settings_header: "การปรับแต่งระบบและตั้งค่า", lang_label: "ภาษา / Language", theme_label: "ธีมสี / Color Theme",
+                        edit_profile: "แก้ไขข้อมูลส่วนตัว", name_label: "ชื่อ - นามสกุล", email_label: "อีเมล", upload_label: "อัปโหลดรูปโปรไฟล์",
+                        save_btn: "บันทึกการเปลี่ยนแปลง", nav_button: "นำทาง", detail_available: "ว่าง", detail_occupied: "ไม่ว่าง",
+                        floor_plan: "แผนผังชั้นล่าง (Ground Floor)", floor_sub: "คลิกที่ช่องจอดเพื่อเปลี่ยนสถานะจำลองการทดสอบ", live_sensors: "เซนเซอร์กล้องทำงานปกติ",
+                        legend_title: "สัญลักษณ์บนแผนที่", legend_building: "อาคารจอดรถ", legend_avail: "ช่องจอดว่าง", legend_nav: "แตะพินเพื่อดูข้อมูล"
+                    }
+                };
+            }
 
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 19,
-                    attribution: '&copy; OpenStreetMap contributors'
-                }).addTo(kkuMap);
+            init() {
+                this.apply(this.currentLang);
+            }
 
-                buildingsData.forEach(b => {
-                    const stats = getBuildingStats(b);
-                    const marker = L.marker([b.lat, b.lng]).addTo(kkuMap);
-                    marker.bindPopup(`
-                        <div style="font-family: Inter, sans-serif; padding: 4px; min-width: 140px;">
-                            <h4 style="font-weight: bold; font-size: 14px; color: #a51931; margin-bottom: 2px;">${b.name}</h4>
-                            <p style="font-size: 12px; color: #64748b; margin-bottom: 6px;">${b.desc}</p>
-                            <span style="background: #10b981; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold;">Available: ${stats.available} slots</span>
-                            <div style="margin-top: 8px; display: flex; gap: 4px;">
-                                <button onclick="openBuildingDetail('${b.id}')" style="background: #a51931; color: white; border: none; padding: 5px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; flex: 1; font-weight: 500;">View</button>
-                                <button onclick="openGoogleMapsNavigation(${b.lat}, ${b.lng}, '${b.name}')" style="background: #2563eb; color: white; border: none; padding: 5px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; flex: 1; font-weight: 500;"><i class="fa-solid fa-diamond-turn-right"></i> Navigate</button>
+            apply(lang) {
+                this.currentLang = lang;
+                localStorage.setItem('kku_lang', lang);
+                const langSelect = document.getElementById('select-lang');
+                if (langSelect) langSelect.value = lang;
+
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (this.translations[lang][key]) {
+                        el.textContent = this.translations[lang][key];
+                    }
+                });
+
+                document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                    const key = el.getAttribute('data-i18n-placeholder');
+                    if (this.translations[lang][key]) {
+                        el.placeholder = this.translations[lang][key];
+                    }
+                });
+            }
+
+            changeLanguage(lang) {
+                this.apply(lang);
+            }
+        }
+
+        /**
+         * ProfileManager Class: Manages administrator profile data, initials, and image uploads.
+         */
+        class ProfileManager {
+            constructor() {
+                this.profile = {
+                    name: localStorage.getItem('kku_p_name') || 'Administrator',
+                    email: localStorage.getItem('kku_p_email') || 'admin@kku.ac.th',
+                    imgUrl: localStorage.getItem('kku_p_img') || ''
+                };
+            }
+
+            init() {
+                this.render();
+            }
+
+            render() {
+                document.getElementById('sidebar-name').textContent = this.profile.name;
+                document.getElementById('sidebar-email').textContent = this.profile.email;
+                document.getElementById('profile-display-name').textContent = this.profile.name;
+                document.getElementById('profile-display-email').textContent = this.profile.email;
+
+                document.getElementById('input-name').value = this.profile.name;
+                document.getElementById('input-email').value = this.profile.email;
+
+                this.updateAvatar();
+            }
+
+            updateAvatar() {
+                const sidebarAvatar = document.getElementById('sidebar-avatar');
+                const profileAvatarBox = document.getElementById('profile-avatar-box');
+                const initials = this.profile.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'AD';
+
+                if (this.profile.imgUrl) {
+                    sidebarAvatar.innerHTML = `<img src="${this.profile.imgUrl}" class="w-full h-full object-cover" alt="Avatar">`;
+                    profileAvatarBox.innerHTML = `<img src="${this.profile.imgUrl}" class="w-full h-full object-cover" alt="Avatar">`;
+                } else {
+                    sidebarAvatar.innerHTML = `<span>${initials}</span>`;
+                    profileAvatarBox.innerHTML = `<span>${initials}</span>`;
+                }
+            }
+
+            handleImageUpload(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        this.profile.imgUrl = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+
+            saveChanges() {
+                const newName = document.getElementById('input-name').value.trim();
+                const newEmail = document.getElementById('input-email').value.trim();
+
+                if (!newName) {
+                    showToast('Please enter a valid name.', 'error');
+                    return;
+                }
+
+                this.profile.name = newName;
+                this.profile.email = newEmail || 'admin@kku.ac.th';
+
+                localStorage.setItem('kku_p_name', this.profile.name);
+                localStorage.setItem('kku_p_email', this.profile.email);
+                localStorage.setItem('kku_p_img', this.profile.imgUrl);
+
+                this.render();
+                showToast('Profile updated successfully!', 'success');
+            }
+        }
+
+        /**
+         * ParkingManager Class: Manages building slots, analytics, logs, and backend polling.
+         */
+        class ParkingManager {
+            constructor() {
+                this.buildings = [
+                    { id: 'A', name: 'Building A', desc: 'Faculty of Engineering', lat: 16.4745, lng: 102.8225, total: 10, slots: Array(10).fill(true) },
+                    { id: 'B', name: 'Building B', desc: 'Faculty of Science', lat: 16.4720, lng: 102.8240, total: 10, slots: Array(10).fill(true) },
+                    { id: 'C', name: 'Building C', desc: 'Faculty of Business Administration', lat: 16.4690, lng: 102.8210, total: 10, slots: Array(10).fill(true) },
+                    { id: 'D', name: 'Building D', desc: 'Faculty of Humanities and Social Sciences', lat: 16.4760, lng: 102.8190, total: 10, slots: Array(10).fill(true) },
+                    { id: 'E', name: 'Building E', desc: 'Central Library', lat: 16.4735, lng: 102.8165, total: 10, slots: Array(10).fill(true) },
+                    { id: 'F', name: 'Building F', desc: 'Complex Building & Food Center', lat: 16.4705, lng: 102.8255, total: 10, slots: Array(10).fill(true) },
+                    { id: 'G', name: 'Building G', desc: 'Golden Jubilee Convention Center', lat: 16.4635, lng: 102.8280, total: 10, slots: Array(10).fill(true) }
+                ];
+                this.currentActiveBuilding = null;
+                this.historyLogs = [];
+                this.apiUrl = 'https://anthill-husband-unwatched.ngrok-free.dev/api/status';
+            }
+
+            init() {
+                this.addInitialLog();
+                this.renderDashboard();
+                this.startPolling();
+            }
+
+            getStats(building) {
+                const available = building.slots.filter(s => s === true).length;
+                const occupied = building.total - available;
+                const percentage = Math.round((available / building.total) * 100);
+                return { available, occupied, percentage };
+            }
+
+            updateGlobalStats() {
+                let t = 0, a = 0, o = 0;
+                this.buildings.forEach(b => {
+                    const stats = this.getStats(b);
+                    t += b.total; a += stats.available; o += stats.occupied;
+                });
+                const totalEl = document.getElementById('global-total');
+                const availEl = document.getElementById('global-available');
+                const occEl = document.getElementById('global-occupied');
+                if (totalEl) totalEl.textContent = t;
+                if (availEl) availEl.textContent = a;
+                if (occEl) occEl.textContent = o;
+            }
+
+            renderDashboard() {
+                this.updateGlobalStats();
+                const grid = document.getElementById('buildings-grid');
+                if (!grid) return;
+                grid.innerHTML = '';
+
+                this.buildings.forEach(b => {
+                    const stats = this.getStats(b);
+                    const card = document.createElement('div');
+                    card.className = 'card-surface p-6 rounded-3xl border border-theme shadow-sm cursor-pointer hover:shadow-lg transition-all group';
+                    card.onclick = () => app.openBuildingDetail(b.id);
+                    
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-5">
+                            <div>
+                                <h4 class="font-extrabold text-lg text-main group-hover:text-primary-theme transition-colors">${b.name}</h4>
+                                <p class="text-xs text-muted mt-1 font-medium">${b.desc}</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-2xl subtle-surface border border-theme flex flex-col items-center justify-center shadow-sm">
+                                <span class="text-base font-extrabold text-main leading-none">${stats.available}</span>
                             </div>
                         </div>
-                    `);
+                        <div class="mb-2 flex justify-between text-xs font-bold">
+                            <span class="text-muted">Capacity</span>
+                            <span class="text-main">${stats.percentage}% Free</span>
+                        </div>
+                        <div class="w-full h-3 subtle-surface rounded-full flex overflow-hidden border border-theme shadow-inner">
+                            <div class="h-full bg-emerald-500 rounded-full transition-all duration-500 shadow-sm" style="width: ${stats.percentage}%"></div>
+                        </div>
+                        <div class="mt-5 flex gap-5 text-xs font-semibold">
+                            <div class="flex items-center text-emerald-600 dark:text-emerald-400"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-2 shadow-sm"></span>${stats.available} Open</div>
+                            <div class="flex items-center text-rose-600 dark:text-rose-400"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 mr-2 shadow-sm"></span>${stats.occupied} Full</div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
                 });
-                mapInitialized = true;
-            } else {
-                kkuMap.invalidateSize();
+            }
+
+            logActivity(buildingName, slotId, isAvailable, source) {
+                const now = new Date();
+                const timeStr = `${now.toLocaleDateString('en-GB')} ${now.toLocaleTimeString()}`;
+                this.historyLogs.unshift({
+                    time: timeStr,
+                    building: buildingName,
+                    slot: slotId,
+                    status: isAvailable ? 'Available' : 'Occupied',
+                    source: source
+                });
+                if (this.historyLogs.length > 50) this.historyLogs.pop();
+                this.renderHistoryTable();
+                this.updateAnalytics();
+            }
+
+            addInitialLog() {
+                const now = new Date();
+                this.historyLogs.unshift({
+                    time: `${now.toLocaleDateString('en-GB')} ${now.toLocaleTimeString()}`,
+                    building: 'System Initialization',
+                    slot: 'A-01',
+                    status: 'Available',
+                    source: 'System'
+                });
+                this.renderHistoryTable();
+            }
+
+            renderHistoryTable() {
+                const tbody = document.getElementById('history-table-body');
+                const emptyEl = document.getElementById('history-empty');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+
+                if (this.historyLogs.length === 0) {
+                    if (emptyEl) emptyEl.classList.remove('hidden');
+                    return;
+                } else {
+                    if (emptyEl) emptyEl.classList.add('hidden');
+                }
+
+                this.historyLogs.forEach(log => {
+                    const tr = document.createElement('tr');
+                    tr.className = "subtle-surface transition-colors hover:opacity-90";
+                    const badgeColor = log.status === 'Available' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20';
+                    
+                    tr.innerHTML = `
+                        <td class="py-4 px-6 font-medium text-muted">${log.time}</td>
+                        <td class="py-4 px-6 font-bold text-main">${log.building}</td>
+                        <td class="py-4 px-6 font-semibold text-secondary">${log.slot}</td>
+                        <td class="py-4 px-6"><span class="px-3 py-1 rounded-lg text-xs font-extrabold border ${badgeColor}">${log.status}</span></td>
+                        <td class="py-4 px-6 text-muted font-medium">${log.source}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            clearLogs() {
+                this.historyLogs = [];
+                this.renderHistoryTable();
+            }
+
+            updateAnalytics() {
+                const container = document.getElementById('analytics-bars-container');
+                const topBuildingEl = document.getElementById('analytics-top-building');
+                if (!container) return;
+                container.innerHTML = '';
+
+                let maxOccupied = -1;
+                let topBuildingName = 'Building A';
+
+                this.buildings.forEach(b => {
+                    const stats = this.getStats(b);
+                    if (stats.occupied > maxOccupied) {
+                        maxOccupied = stats.occupied;
+                        topBuildingName = b.name;
+                    }
+
+                    const occPercent = 100 - stats.percentage;
+                    const barColor = occPercent > 70 ? 'bg-rose-500' : (occPercent > 40 ? 'bg-amber-500' : 'bg-emerald-500');
+
+                    const row = document.createElement('div');
+                    row.className = "space-y-1.5";
+                    row.innerHTML = `
+                        <div class="flex justify-between text-xs font-bold text-main">
+                            <span>${b.name} (${b.desc})</span>
+                            <span class="text-secondary">${stats.occupied} / ${b.total} Occupied (${occPercent.toFixed(0)}%)</span>
+                        </div>
+                        <div class="w-full h-3 subtle-surface rounded-full overflow-hidden border border-theme shadow-inner">
+                            <div class="h-full rounded-full transition-all duration-500 ${barColor} shadow-sm" style="width: ${occPercent}%"></div>
+                        </div>
+                    `;
+                    container.appendChild(row);
+                });
+
+                if (topBuildingEl) topBuildingEl.textContent = `${topBuildingName} (${maxOccupied} Vehicles)`;
+            }
+
+            startPolling() {
+                setInterval(() => {
+                    fetch(this.apiUrl, { method: 'GET', headers: { "ngrok-skip-browser-warning": "true" } })
+                    .then(res => res.json())
+                    .then(data => {
+                        const dot = document.getElementById('api-status-dot');
+                        const txt = document.getElementById('api-status-text');
+                        if (dot && txt) {
+                            txt.textContent = 'Camera Active';
+                            dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse';
+                        }
+                    })
+                    .catch(() => {
+                        const dot = document.getElementById('api-status-dot');
+                        const txt = document.getElementById('api-status-text');
+                        if (dot && txt) {
+                            txt.textContent = 'Camera Offline';
+                            dot.className = 'w-2.5 h-2.5 rounded-full bg-rose-500';
+                        }
+                    });
+                }, 3000);
             }
         }
 
-        function updateConnectionStatus(connected) {
-            const statusDiv = document.getElementById('api-status');
-            const statusDot = document.getElementById('api-status-dot');
-            const statusText = document.getElementById('api-status-text');
+        /**
+         * MapManager Class: Manages Leaflet Map integration and custom markers.
+         */
+        class MapManager {
+            constructor() {
+                this.map = null;
+                this.initialized = false;
+                this.apiKey = 'cb1_3ua3_1_4d314d304cdcdf89721406a3';
+            }
 
-            if (connected) {
-                statusDiv.className = "flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-200 bg-emerald-50 text-xs font-medium text-emerald-700";
-                statusText.textContent = 'Camera Active';
-                statusDot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
-            } else {
-                statusDiv.className = "flex items-center gap-2 px-3 py-1.5 rounded-full border border-red-200 bg-red-50 text-xs font-medium text-red-700";
-                statusText.textContent = 'Camera Offline';
-                statusDot.className = "w-2 h-2 rounded-full bg-red-500";
+            init() {
+                if (!this.initialized) {
+                    this.map = L.map('kku-leaflet-map').setView([16.4735, 102.8210], 15);
+                    L.tileLayer(`https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=${this.apiKey}`, {
+                        maxZoom: 19,
+                        attribution: '&copy; CARTO'
+                    }).addTo(this.map);
+
+                    app.parkingManager.buildings.forEach(b => {
+                        const stats = app.parkingManager.getStats(b);
+                        const marker = L.marker([b.lat, b.lng]).addTo(this.map);
+                        marker.bindPopup(`
+                            <div style="font-family: Inter, sans-serif; padding: 6px; min-width: 150px;">
+                                <h4 style="font-weight: 800; font-size: 14px; color: var(--primary); margin-bottom: 3px;">${b.name}</h4>
+                                <p style="font-size: 12px; color: #64748b; margin-bottom: 8px;">${b.desc}</p>
+                                <span style="background: #10b981; color: white; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700;">Available: ${stats.available} slots</span>
+                                <div style="margin-top: 10px;">
+                                    <button onclick="app.openBuildingDetail('${b.id}')" style="background: var(--primary); color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; width: 100%; font-weight: 700; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">View Parking</button>
+                                </div>
+                            </div>
+                        `);
+                    });
+                    this.initialized = true;
+                } else {
+                    this.map.invalidateSize();
+                }
+            }
+
+            openNavigationForActiveBuilding() {
+                const b = app.parkingManager.currentActiveBuilding;
+                if (b) {
+                    window.open(`https://www.google.com/maps/dir/?api=1&destination=${b.lat},${b.lng}&travelmode=driving`, '_blank');
+                }
             }
         }
 
-        function fetchLiveStatus() {
-            fetch(API_URL, {
-                method: 'GET',
-                headers: { "ngrok-skip-browser-warning": "true", "Content-Type": "application/json" }
-            })
-            .then(response => { if (!response.ok) throw new Error('Error'); return response.json(); })
-            .then(data => {
-                updateConnectionStatus(true);
-                const buildingA = buildingsData.find(b => b.id === 'A');
-                if(buildingA) {
-                    for(let i = 0; i < 10; i++) {
-                        const slotKey = `A${i+1}`;
-                        if(data[slotKey] !== undefined) {
-                            const newState = !data[slotKey];
-                            if (buildingA.slots[i] !== newState) {
-                                buildingA.slots[i] = newState;
-                                logActivity('Building A', `A-${String(i+1).padStart(2, '0')}`, newState, 'AI Camera YOLOv8');
-                            }
+        /**
+         * AppController Class: Central coordinator for all views and state transitions.
+         */
+        class AppController {
+            constructor() {
+                this.themeManager = new ThemeManager();
+                this.languageManager = new LanguageManager();
+                this.profileManager = new ProfileManager();
+                this.parkingManager = new ParkingManager();
+                this.mapManager = new MapManager();
+            }
+
+            init() {
+                // Initialize theme, language, profile, parking first
+                this.themeManager.init();
+                this.languageManager.init();
+                this.profileManager.init();
+                this.parkingManager.init();
+
+                // Explicitly set default view to home/dashboard immediately
+                this.switchView('home');
+
+                // Fade out splash screen after a short professional delay
+                setTimeout(() => {
+                    const splash = document.getElementById('splash-screen');
+                    if (splash) {
+                        splash.classList.add('fade-out');
+                        setTimeout(() => splash.remove(), 500);
+                    }
+                }, 800);
+            }
+
+            switchView(viewName) {
+                ['home', 'map', 'history', 'profile', 'detail'].forEach(v => {
+                    const el = document.getElementById(`view-${v}`);
+                    if (el) {
+                        if (v === viewName) {
+                            el.classList.add('view-active');
+                            void el.offsetWidth; // Force reflow
+                        } else {
+                            el.classList.remove('view-active');
                         }
                     }
+                });
+
+                ['home', 'map', 'history', 'profile'].forEach(m => {
+                    const navBtn = document.getElementById(`nav-${m}`);
+                    const mobBtn = document.getElementById(`mob-${m}`);
+                    if (m === viewName) {
+                        if (navBtn) navBtn.className = "nav-btn w-full flex items-center px-4 py-3 rounded-xl font-bold transition-all bg-primary-light text-primary-theme border border-theme shadow-sm";
+                        if (mobBtn) mobBtn.className = "mob-btn flex flex-col items-center justify-center w-full text-primary-theme font-bold py-2";
+                    } else {
+                        if (navBtn) navBtn.className = "nav-btn w-full flex items-center px-4 py-3 rounded-xl font-semibold transition-all text-muted hover:opacity-80";
+                        if (mobBtn) mobBtn.className = "mob-btn flex flex-col items-center justify-center w-full text-muted py-2";
+                    }
+                });
+
+                if (viewName === 'map') {
+                    setTimeout(() => this.mapManager.init(), 100);
                 }
-                updateGlobalStats();
-                renderDashboard();
-                if (currentActiveBuilding && document.getElementById('view-detail').classList.contains('view-active')) {
-                    renderSlots();
-                    updateDetailStats();
+                if (viewName === 'history') {
+                    this.parkingManager.updateAnalytics();
                 }
-            })
-            .catch(() => updateConnectionStatus(false));
-        }
+            }
 
-        function startApiPolling() {
-            fetchLiveStatus();
-            setInterval(fetchLiveStatus, 1500);
-        }
+            openBuildingDetail(buildingId) {
+                const building = this.parkingManager.buildings.find(b => b.id === buildingId);
+                if (!building) return;
+                this.parkingManager.currentActiveBuilding = building;
 
-        function getBuildingStats(building) {
-            const available = building.slots.filter(status => status === true).length;
-            const occupied = building.total - available;
-            const percentage = (available / building.total) * 100;
-            return { available, occupied, percentage };
-        }
+                document.getElementById('detail-building-name').textContent = building.name;
+                document.getElementById('detail-building-desc').textContent = building.desc;
+                this.renderSlots();
+                this.updateDetailStats();
+                this.switchView('detail');
+            }
 
-        function updateGlobalStats() {
-            let t = 0, a = 0, o = 0;
-            buildingsData.forEach(b => {
-                const stats = getBuildingStats(b);
-                t += b.total; a += stats.available; o += stats.occupied;
-            });
-            document.getElementById('global-total').textContent = t;
-            document.getElementById('global-available').textContent = a;
-            document.getElementById('global-occupied').textContent = o;
-        }
+            updateDetailStats() {
+                const b = this.parkingManager.currentActiveBuilding;
+                if (!b) return;
+                const stats = this.parkingManager.getStats(b);
+                document.getElementById('detail-av-count').textContent = stats.available;
+                document.getElementById('detail-occ-count').textContent = stats.occupied;
+            }
 
-        function renderDashboard() {
-            updateGlobalStats();
-            const grid = document.getElementById('buildings-grid');
-            grid.innerHTML = '';
+            toggleSlot(index) {
+                const b = this.parkingManager.currentActiveBuilding;
+                if (!b) return;
+                b.slots[index] = !b.slots[index];
+                const slotName = `${b.id}-${String(index + 1).padStart(2, '0')}`;
+                this.parkingManager.logActivity(b.name, slotName, b.slots[index], 'Manual Testing');
+                this.renderSlots();
+                this.updateDetailStats();
+            }
 
-            buildingsData.forEach(b => {
-                const stats = getBuildingStats(b);
-                const card = document.createElement('div');
-                card.className = 'bg-white p-6 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-kku-red/50 hover:shadow-md transition-all group';
-                card.onclick = () => openBuildingDetail(b.id);
-                
-                card.innerHTML = `
-                    <div class="flex justify-between items-start mb-6">
-                        <div>
-                            <h4 class="font-bold text-lg text-slate-800 group-hover:text-kku-red transition-colors">${b.name}</h4>
-                            <p class="text-xs text-slate-500 mt-1">${b.desc}</p>
+            renderSlots() {
+                const b = this.parkingManager.currentActiveBuilding;
+                if (!b) return;
+                const topRow = document.getElementById('slots-top');
+                const bottomRow = document.getElementById('slots-bottom');
+                if (!topRow || !bottomRow) return;
+                topRow.innerHTML = ''; bottomRow.innerHTML = '';
+
+                b.slots.forEach((isAvailable, index) => {
+                    const slotNum = index + 1;
+                    const isTopRow = index < 5;
+                    const slotDiv = document.createElement('div');
+                    let classes = 'parking-slot relative h-28 md:h-32 border-2 rounded-2xl flex flex-col items-center justify-center cursor-pointer card-surface group shadow-sm ';
+                    
+                    classes += isTopRow ? 'border-b-0 rounded-b-none ' : 'border-t-0 rounded-t-none ';
+                    classes += isAvailable ? 'border-emerald-500 hover:bg-emerald-500/10' : 'border-rose-500 bg-rose-500/10';
+
+                    slotDiv.className = classes;
+                    slotDiv.onclick = () => this.toggleSlot(index);
+                    
+                    const carVisual = isAvailable ? 
+                        `<div class="w-3 h-3 rounded-full bg-emerald-500 mb-2 shadow-sm"></div>` : 
+                        `<i class="fa-solid fa-car text-2xl md:text-3xl text-rose-500 mb-2 ${isTopRow ? 'rotate-180' : ''}"></i>`;
+
+                    slotDiv.innerHTML = `
+                        ${carVisual}
+                        <span class="text-xs md:text-sm font-extrabold ${isAvailable ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'} ${isTopRow ? '' : 'rotate-180'}">
+                            ${b.id}-${String(slotNum).padStart(2, '0')}
+                        </span>
+                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity ${isTopRow ? 'rounded-t-2xl' : 'rounded-b-2xl'} backdrop-blur-xs">
+                            <span class="text-white text-xs font-bold px-2 text-center tracking-wide">Click to ${isAvailable ? 'Park' : 'Leave'}</span>
                         </div>
-                        <div class="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center">
-                            <span class="text-lg font-bold text-slate-700 leading-none">${stats.available}</span>
-                        </div>
-                    </div>
-                    <div class="mb-2 flex justify-between text-xs font-semibold">
-                        <span class="text-slate-500">Capacity</span>
-                        <span class="text-slate-800">${stats.percentage}% Free</span>
-                    </div>
-                    <div class="w-full h-2.5 bg-red-100 rounded-full flex overflow-hidden">
-                        <div class="h-full bg-emerald-400 rounded-full transition-all duration-500" style="width: ${stats.percentage}%"></div>
-                    </div>
-                    <div class="mt-4 flex gap-4 text-xs">
-                        <div class="flex items-center text-emerald-600 font-medium"><span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>${stats.available} Open</div>
-                        <div class="flex items-center text-red-500 font-medium"><span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span>${stats.occupied} Full</div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
+                    `;
+
+                    if (isTopRow) topRow.appendChild(slotDiv);
+                    else bottomRow.appendChild(slotDiv);
+                });
+            }
         }
 
-        function openBuildingDetail(buildingId) {
-            currentActiveBuilding = buildingsData.find(b => b.id === buildingId);
-            document.getElementById('detail-building-name').textContent = currentActiveBuilding.name;
-            document.getElementById('detail-building-desc').textContent = currentActiveBuilding.desc;
-            renderSlots();
-            updateDetailStats();
-
-            const views = ['home', 'map', 'history', 'profile', 'detail'];
-            views.forEach(v => {
-                const el = document.getElementById(`view-${v}`);
-                if(el) el.className = (v === 'detail') ? 'view-container view-active h-full flex flex-col w-full absolute inset-0 overflow-y-auto bg-white' : 'view-container view-hidden h-full flex flex-col w-full absolute inset-0';
-            });
-        }
-
-        function navigateBack() {
-            renderDashboard();
-            switchView('home');
-            currentActiveBuilding = null;
-        }
-
-        function updateDetailStats() {
-            if(!currentActiveBuilding) return;
-            const stats = getBuildingStats(currentActiveBuilding);
-            document.getElementById('detail-av-count').textContent = stats.available;
-            document.getElementById('detail-occ-count').textContent = stats.occupied;
-        }
-
-        function toggleSlot(index) {
-            if(!currentActiveBuilding) return;
-            currentActiveBuilding.slots[index] = !currentActiveBuilding.slots[index];
-            const slotName = `${currentActiveBuilding.id}-${String(index + 1).padStart(2, '0')}`;
-            logActivity(currentActiveBuilding.name, slotName, currentActiveBuilding.slots[index], 'Manual Testing');
-            renderSlots();
-            updateDetailStats();
-        }
-
-        function renderSlots() {
-            if(!currentActiveBuilding) return;
-            const topRow = document.getElementById('slots-top');
-            const bottomRow = document.getElementById('slots-bottom');
-            topRow.innerHTML = ''; bottomRow.innerHTML = '';
-
-            currentActiveBuilding.slots.forEach((isAvailable, index) => {
-                const slotNum = index + 1;
-                const isTopRow = index < 5;
-                const slotDiv = document.createElement('div');
-                let classes = 'parking-slot relative h-28 md:h-32 border-2 rounded-lg flex flex-col items-center justify-center cursor-pointer bg-white group ';
-                
-                classes += isTopRow ? 'border-b-0 rounded-b-none ' : 'border-t-0 rounded-t-none ';
-                classes += isAvailable ? 'border-emerald-400 hover:bg-emerald-50' : 'border-red-400 bg-red-50/50';
-
-                slotDiv.className = classes;
-                slotDiv.onclick = () => toggleSlot(index);
-                
-                const carVisual = isAvailable ? 
-                    `<div class="w-2.5 h-2.5 rounded-full bg-emerald-500 mb-2"></div>` : 
-                    `<i class="fa-solid fa-car text-2xl md:text-3xl text-red-400 mb-2 ${isTopRow ? 'rotate-180' : ''}"></i>`;
-
-                slotDiv.innerHTML = `
-                    ${carVisual}
-                    <span class="text-xs md:text-sm font-bold ${isAvailable ? 'text-emerald-700' : 'text-red-700'} ${isTopRow ? '' : 'rotate-180'}">
-                        ${currentActiveBuilding.id}-${String(slotNum).padStart(2, '0')}
-                    </span>
-                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity ${isTopRow ? 'rounded-t-lg' : 'rounded-b-lg'}">
-                        <span class="text-white text-xs font-semibold px-2 text-center">Click to ${isAvailable ? 'Park' : 'Leave'}</span>
-                    </div>
-                `;
-
-                if (isTopRow) topRow.appendChild(slotDiv);
-                else bottomRow.appendChild(slotDiv);
-            });
-        }
+        // Initialize Application
+        const app = new AppController();
+        document.addEventListener('DOMContentLoaded', () => app.init());
     </script>
 </body>
 </html>
