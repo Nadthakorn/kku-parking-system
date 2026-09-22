@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KKU Parking - Desktop System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KKU Parking - System</title>
     
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,6 +13,12 @@
     
     <!-- Load Google Fonts (Inter) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Load Leaflet CSS (สำหรับแผนที่จริง) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
+    <!-- Load Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <script>
         tailwind.config = {
@@ -38,19 +44,17 @@
         body {
             background-color: #fcfcfc;
             color: #1e293b;
+            overscroll-behavior-y: none;
         }
 
-        /* Splash Screen Transitions */
         #splash-screen {
             transition: opacity 0.6s ease-in-out, visibility 0.6s ease-in-out;
         }
-        
         .fade-out {
             opacity: 0;
             visibility: hidden;
         }
 
-        /* View Transitions */
         .view-container {
             transition: opacity 0.3s ease, transform 0.3s ease;
         }
@@ -71,22 +75,11 @@
             visibility: visible;
         }
 
-        /* Custom Scrollbar for Desktop */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        /* Slot Hover Effects */
         .parking-slot {
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -107,9 +100,8 @@
         <p class="text-slate-500 mt-2 text-sm font-medium uppercase tracking-widest">Management System</p>
     </div>
 
-    <!-- ================= SIDEBAR (แสดงบนคอม, ซ่อนบนมือถือ) ================= -->
+    <!-- ================= SIDEBAR (Desktop) ================= -->
     <aside class="w-64 bg-white border-r border-slate-200 h-full hidden md:flex flex-col z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)] fixed left-0 top-0">
-        <!-- Logo Area -->
         <div class="h-20 flex items-center px-6 border-b border-slate-100">
             <i class="fa-solid fa-building-columns text-2xl text-kku-red mr-3"></i>
             <div>
@@ -118,32 +110,24 @@
             </div>
         </div>
 
-        <!-- Navigation Links -->
         <nav class="flex-1 px-4 py-6 space-y-2">
-            <button class="w-full flex items-center px-4 py-3 bg-kku-red/5 text-kku-red rounded-xl font-medium transition-colors border border-kku-red/10">
-                <i class="fa-solid fa-house w-6 text-center mr-2"></i>
-                Dashboard
+            <button onclick="switchView('home')" id="nav-home" class="w-full flex items-center px-4 py-3 bg-kku-red/5 text-kku-red rounded-xl font-medium transition-colors border border-kku-red/10">
+                <i class="fa-solid fa-house w-6 text-center mr-2"></i> Dashboard
+            </button>
+            <button onclick="switchView('map')" id="nav-map" class="w-full flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl font-medium transition-colors">
+                <i class="fa-solid fa-map w-6 text-center mr-2"></i> Campus Map
             </button>
             <button class="w-full flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl font-medium transition-colors">
-                <i class="fa-solid fa-map w-6 text-center mr-2"></i>
-                Campus Map
+                <i class="fa-solid fa-clock-rotate-left w-6 text-center mr-2"></i> History Log
             </button>
             <button class="w-full flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl font-medium transition-colors">
-                <i class="fa-solid fa-clock-rotate-left w-6 text-center mr-2"></i>
-                History Log
-            </button>
-            <button class="w-full flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl font-medium transition-colors">
-                <i class="fa-solid fa-user-gear w-6 text-center mr-2"></i>
-                System Profile
+                <i class="fa-solid fa-user-gear w-6 text-center mr-2"></i> System Profile
             </button>
         </nav>
 
-        <!-- User Profile Bottom -->
         <div class="p-4 border-t border-slate-100">
-            <div class="flex items-center px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 hover:border-slate-300 transition-colors cursor-pointer">
-                <div class="w-8 h-8 rounded-full bg-kku-red text-white flex items-center justify-center font-bold text-sm mr-3">
-                    AD
-                </div>
+            <div class="flex items-center px-4 py-3 bg-slate-50 rounded-xl border border-slate-200">
+                <div class="w-8 h-8 rounded-full bg-kku-red text-white flex items-center justify-center font-bold text-sm mr-3">AD</div>
                 <div class="flex-1 overflow-hidden">
                     <p class="text-sm font-semibold text-slate-900 truncate">Administrator</p>
                     <p class="text-xs text-slate-500 truncate">admin@kku.ac.th</p>
@@ -155,20 +139,14 @@
     <!-- ================= MAIN CONTENT ================= -->
     <main class="flex-1 h-full flex flex-col relative bg-slate-50/50 md:ml-64 pb-20 md:pb-0">
         
-        <!-- HOME VIEW (Dashboard) -->
+        <!-- 1. HOME VIEW (Dashboard) -->
         <div id="view-home" class="view-container view-active h-full flex flex-col w-full absolute inset-0 overflow-y-auto">
-            
-            <!-- Top Header -->
             <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 sticky top-0 z-10">
                 <h2 class="text-lg md:text-xl font-bold text-slate-800">Overview Dashboard</h2>
-                
-                <!-- Search Bar -->
                 <div class="w-64 md:w-96 relative group hidden sm:block">
-                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-kku-red transition-colors"></i>
-                    <input type="text" placeholder="Search building name or lot ID..." class="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-full text-sm focus:outline-none focus:bg-white focus:border-kku-red/50 focus:ring-4 focus:ring-kku-red/10 transition-all">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" placeholder="Search building name or lot ID..." class="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-full text-sm focus:outline-none">
                 </div>
-
-                <!-- API Connection Status -->
                 <div id="api-status" class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-200 bg-slate-50 text-xs font-medium text-slate-500">
                     <span id="api-status-dot" class="w-2 h-2 rounded-full bg-slate-400 animate-pulse"></span>
                     <span id="api-status-text">Connecting...</span>
@@ -176,196 +154,120 @@
             </header>
 
             <div class="p-4 md:p-8 max-w-7xl mx-auto w-full">
-                
-                <!-- System Status Summary -->
                 <div class="mb-8">
                     <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Real-time Capacity</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center">
-                            <div class="w-14 h-14 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xl mr-5">
-                                <i class="fa-solid fa-car"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-slate-500 font-medium">Total Spaces</p>
-                                <p id="global-total" class="text-3xl font-bold text-slate-800">50</p>
-                            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                        <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center">
+                            <div class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-lg md:text-xl mr-4 md:mr-5"><i class="fa-solid fa-car"></i></div>
+                            <div><p class="text-xs md:text-sm text-slate-500 font-medium">Total Spaces</p><p id="global-total" class="text-2xl md:text-3xl font-bold text-slate-800">50</p></div>
                         </div>
-                        
-                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center">
-                            <div class="w-14 h-14 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl mr-5 relative">
-                                <span class="absolute top-1 right-1 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full animate-pulse"></span>
-                                <i class="fa-solid fa-circle-check"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-slate-500 font-medium">Available</p>
-                                <p id="global-available" class="text-3xl font-bold text-available">50</p>
-                            </div>
+                        <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center">
+                            <div class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg md:text-xl mr-4 md:mr-5 relative"><i class="fa-solid fa-circle-check"></i></div>
+                            <div><p class="text-xs md:text-sm text-slate-500 font-medium">Available</p><p id="global-available" class="text-2xl md:text-3xl font-bold text-available">50</p></div>
                         </div>
-
-                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center">
-                            <div class="w-14 h-14 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xl mr-5">
-                                <i class="fa-solid fa-ban"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-slate-500 font-medium">Occupied</p>
-                                <p id="global-occupied" class="text-3xl font-bold text-occupied">0</p>
-                            </div>
+                        <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center">
+                            <div class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-lg md:text-xl mr-4 md:mr-5"><i class="fa-solid fa-ban"></i></div>
+                            <div><p class="text-xs md:text-sm text-slate-500 font-medium">Occupied</p><p id="global-occupied" class="text-2xl md:text-3xl font-bold text-occupied">0</p></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Parking Buildings Grid -->
                 <div>
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider">Managed Facilities</h3>
-                        <button class="text-sm text-kku-red font-medium hover:underline flex items-center">
-                            Refresh <i class="fa-solid fa-rotate-right ml-2 text-xs"></i>
-                        </button>
                     </div>
-                    
-                    <div id="buildings-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Buildings will be injected here via JavaScript -->
-                    </div>
+                    <div id="buildings-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"></div>
                 </div>
-                
             </div>
         </div>
 
-        <!-- DETAIL VIEW (Single Building Layout) -->
-        <div id="view-detail" class="view-container view-hidden h-full flex flex-col w-full absolute inset-0 overflow-y-auto bg-white">
-            
-            <!-- Detail Header -->
+        <!-- 2. CAMPUS MAP VIEW (แผนที่จริงขอนแก่น Leaflet พร้อมรองรับมือถือ) -->
+        <div id="view-map" class="view-container view-hidden h-full flex flex-col w-full absolute inset-0 bg-white">
             <header class="h-20 bg-white border-b border-slate-200 flex items-center px-4 md:px-8 sticky top-0 z-10">
-                <button onclick="navigateBack()" class="w-10 h-10 flex items-center justify-center bg-slate-50 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-kku-red transition-colors mr-4 md:mr-6">
-                    <i class="fa-solid fa-arrow-left"></i>
-                </button>
                 <div>
-                    <h2 id="detail-building-name" class="text-lg md:text-xl font-bold text-slate-800">Building Name</h2>
+                    <h2 class="text-lg md:text-xl font-bold text-slate-800">Khon Kaen University Campus Map</h2>
+                    <p class="text-xs md:text-sm text-slate-500">Interactive real-time building locations in KKU</p>
+                </div>
+            </header>
+            <div class="flex-1 w-full p-3 md:p-6 bg-slate-50">
+                <div class="w-full h-full rounded-2xl border border-slate-200 shadow-sm overflow-hidden relative z-10" id="kku-leaflet-map"></div>
+            </div>
+        </div>
+
+        <!-- 3. DETAIL VIEW (Single Building Layout) -->
+        <div id="view-detail" class="view-container view-hidden h-full flex flex-col w-full absolute inset-0 overflow-y-auto bg-white">
+            <header class="h-20 bg-white border-b border-slate-200 flex items-center px-4 md:px-8 sticky top-0 z-10">
+                <button onclick="navigateBack()" class="w-10 h-10 flex items-center justify-center bg-slate-50 border border-slate-200 rounded-xl text-slate-600 hover:text-kku-red mr-4"><i class="fa-solid fa-arrow-left"></i></button>
+                <div>
+                    <h2 id="detail-building-name" class="text-base md:text-xl font-bold text-slate-800">Building Name</h2>
                     <p id="detail-building-desc" class="text-xs md:text-sm text-slate-500">Location description</p>
                 </div>
                 <div class="ml-auto hidden sm:flex gap-3">
-                    <div class="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-bold border border-emerald-100">
-                        Available: <span id="detail-av-count">10</span>
-                    </div>
-                    <div class="px-4 py-2 bg-red-50 text-red-700 rounded-lg text-sm font-bold border border-red-100">
-                        Occupied: <span id="detail-occ-count">0</span>
-                    </div>
+                    <div class="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-bold border border-emerald-100">Available: <span id="detail-av-count">10</span></div>
+                    <div class="px-4 py-2 bg-red-50 text-red-700 rounded-lg text-sm font-bold border border-red-100">Occupied: <span id="detail-occ-count">0</span></div>
                 </div>
             </header>
 
             <div class="p-4 md:p-8 flex-1 flex flex-col items-center justify-center bg-slate-50/50">
-                
-                <div class="w-full max-w-4xl bg-white p-6 md:p-10 rounded-3xl border border-slate-200 shadow-sm relative">
-                    
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 md:mb-12">
+                <div class="w-full max-w-4xl bg-white p-5 md:p-10 rounded-3xl border border-slate-200 shadow-sm relative">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 md:mb-8">
                         <div>
-                            <h3 class="font-bold text-lg text-slate-800">Ground Floor Plan</h3>
-                            <p class="text-sm text-slate-500">Click a slot to toggle its status manually for testing.</p>
+                            <h3 class="font-bold text-base md:text-lg text-slate-800">Ground Floor Plan</h3>
+                            <p class="text-xs md:text-sm text-slate-500">Click a slot to toggle its status manually for testing.</p>
                         </div>
-                        <div class="flex items-center text-sm font-semibold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
-                            Live Sensors Active
+                        <div class="flex items-center text-xs md:text-sm font-semibold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span> Live Sensors Active
                         </div>
                     </div>
 
-                    <!-- Layout Container -->
                     <div class="relative bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 md:p-8 overflow-x-auto">
-                        
-                        <!-- Top Row (5 Slots) -->
-                        <div id="slots-top" class="grid grid-cols-5 gap-3 md:gap-6 mb-12 min-w-[500px]">
-                            <!-- Injected via JS -->
-                        </div>
-
-                        <!-- Driving Path -->
+                        <div id="slots-top" class="grid grid-cols-5 gap-3 md:gap-6 mb-12 min-w-[500px]"></div>
                         <div class="flex items-center justify-between text-slate-400 font-bold uppercase tracking-widest px-4 absolute left-0 right-0 top-1/2 -translate-y-1/2 min-w-[500px]">
-                            <div class="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded text-xs md:text-sm">
-                                <i class="fa-solid fa-arrow-right"></i> ENTRY
-                            </div>
-                            
-                            <!-- Road lines -->
-                            <div class="flex-1 flex justify-center gap-4 md:gap-8 px-8">
-                                <div class="w-6 md:w-8 h-1.5 bg-slate-300 rounded-full"></div>
-                                <div class="w-6 md:w-8 h-1.5 bg-slate-300 rounded-full"></div>
-                                <div class="w-6 md:w-8 h-1.5 bg-slate-300 rounded-full"></div>
-                                <div class="w-6 md:w-8 h-1.5 bg-slate-300 rounded-full"></div>
-                            </div>
-
-                            <div class="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded text-xs md:text-sm">
-                                EXIT <i class="fa-solid fa-arrow-right"></i>
-                            </div>
+                            <div class="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded text-xs"><i class="fa-solid fa-arrow-right"></i> ENTRY</div>
+                            <div class="flex-1 flex justify-center gap-4 px-8"><div class="w-6 h-1.5 bg-slate-300 rounded-full"></div><div class="w-6 h-1.5 bg-slate-300 rounded-full"></div></div>
+                            <div class="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded text-xs">EXIT <i class="fa-solid fa-arrow-right"></i></div>
                         </div>
-
-                        <!-- Bottom Row (5 Slots) -->
-                        <div id="slots-bottom" class="grid grid-cols-5 gap-3 md:gap-6 mt-12 min-w-[500px]">
-                            <!-- Injected via JS -->
-                        </div>
-
+                        <div id="slots-bottom" class="grid grid-cols-5 gap-3 md:gap-6 mt-12 min-w-[500px]"></div>
                     </div>
-
-                    <!-- Legend -->
-                    <div class="flex justify-center gap-8 mt-10 pt-6 border-t border-slate-100">
-                        <div class="flex items-center gap-3 text-sm text-slate-600 font-medium">
-                            <div class="w-6 h-6 rounded-md bg-emerald-50 border border-emerald-400 flex items-center justify-center">
-                                <div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
-                            </div>
-                            Available
-                        </div>
-                        <div class="flex items-center gap-3 text-sm text-slate-600 font-medium">
-                            <div class="w-6 h-6 rounded-md bg-red-50 border border-red-400 flex items-center justify-center">
-                                <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
-                            </div>
-                            Occupied
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- ================= BOTTOM NAVIGATION (แสดงเฉพาะบนมือถือ) ================= -->
+    <!-- ================= BOTTOM NAVIGATION (มือถือ) ================= -->
     <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-10px_25px_rgba(0,0,0,0.05)] rounded-t-2xl z-50">
         <div class="flex justify-around items-center h-20 px-2">
-            <button onclick="navigateBackToHome()" class="flex flex-col items-center justify-center w-full text-kku-red">
-                <i class="fa-solid fa-house text-xl mb-1"></i>
-                <span class="text-[10px] font-bold">Dashboard</span>
+            <button onclick="switchView('home')" id="mob-home" class="flex flex-col items-center justify-center w-full text-kku-red">
+                <i class="fa-solid fa-house text-xl mb-1"></i><span class="text-[10px] font-bold">Dashboard</span>
+            </button>
+            <button onclick="switchView('map')" id="mob-map" class="flex flex-col items-center justify-center w-full text-slate-400 hover:text-kku-red">
+                <i class="fa-solid fa-map text-xl mb-1"></i><span class="text-[10px] font-medium">Campus Map</span>
             </button>
             <button class="flex flex-col items-center justify-center w-full text-slate-400 hover:text-kku-red">
-                <i class="fa-solid fa-map text-xl mb-1"></i>
-                <span class="text-[10px] font-medium">Campus Map</span>
+                <i class="fa-solid fa-clock-rotate-left text-xl mb-1"></i><span class="text-[10px] font-medium">History</span>
             </button>
             <button class="flex flex-col items-center justify-center w-full text-slate-400 hover:text-kku-red">
-                <i class="fa-solid fa-clock-rotate-left text-xl mb-1"></i>
-                <span class="text-[10px] font-medium">History</span>
-            </button>
-            <button class="flex flex-col items-center justify-center w-full text-slate-400 hover:text-kku-red">
-                <i class="fa-solid fa-user-gear text-xl mb-1"></i>
-                <span class="text-[10px] font-medium">Profile</span>
+                <i class="fa-solid fa-user-gear text-xl mb-1"></i><span class="text-[10px] font-medium">Profile</span>
             </button>
         </div>
     </nav>
 
     <script>
-        // Initial State Data
         const buildingsData = [
-            { id: 'A', name: 'Building A', desc: 'Engineer building', total: 10, slots: Array(10).fill(true) },
-            { id: 'B', name: 'Building B', desc: 'Science building', total: 10, slots: Array(10).fill(true) },
-            { id: 'C', name: 'Building C', desc: 'Business building', total: 10, slots: Array(10).fill(true) },
-            { id: 'D', name: 'Building D', desc: 'Humanity building', total: 10, slots: Array(10).fill(true) },
-            { id: 'E', name: 'Building E', desc: 'Library building', total: 10, slots: Array(10).fill(true) }
+            { id: 'A', name: 'Building A', desc: 'Engineer building', lat: 16.4745, lng: 102.8225, total: 10, slots: Array(10).fill(true) },
+            { id: 'B', name: 'Building B', desc: 'Science building', lat: 16.4720, lng: 102.8240, total: 10, slots: Array(10).fill(true) },
+            { id: 'C', name: 'Building C', desc: 'Business building', lat: 16.4690, lng: 102.8210, total: 10, slots: Array(10).fill(true) },
+            { id: 'D', name: 'Building D', desc: 'Humanity building', lat: 16.4760, lng: 102.8190, total: 10, slots: Array(10).fill(true) },
+            { id: 'E', name: 'Building E', desc: 'Library building', lat: 16.4735, lng: 102.8165, total: 10, slots: Array(10).fill(true) }
         ];
 
         let currentActiveBuilding = null;
+        let kkuMap = null;
+        let mapInitialized = false;
         
-        // ==========================================
-        // API CONFIGURATION (เชื่อมต่อ Ngrok เรียบร้อยแล้ว)
-        // ==========================================
         const API_URL = 'https://anthill-husband-unwatched.ngrok-free.dev/api/status';
-        let isApiConnected = false;
 
-        // Initialization
         document.addEventListener('DOMContentLoaded', () => {
-            // Remove splash screen
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
                 splash.classList.add('fade-out');
@@ -376,69 +278,104 @@
             startApiPolling();
         });
 
-        // ==========================================
-        // API COMMUNICATION
-        // ==========================================
+        function switchView(viewName) {
+            const views = ['home', 'map', 'detail'];
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if (el) {
+                    if (v === viewName) {
+                        el.classList.replace('view-hidden', 'view-active');
+                    } else {
+                        el.classList.replace('view-active', 'view-hidden');
+                    }
+                }
+            });
+
+            ['home', 'map'].forEach(m => {
+                const navBtn = document.getElementById(`nav-${m}`);
+                const mobBtn = document.getElementById(`mob-${m}`);
+                if(m === viewName) {
+                    if(navBtn) navBtn.className = "w-full flex items-center px-4 py-3 bg-kku-red/5 text-kku-red rounded-xl font-medium transition-colors border border-kku-red/10";
+                    if(mobBtn) mobBtn.className = "flex flex-col items-center justify-center w-full text-kku-red";
+                } else {
+                    if(navBtn) navBtn.className = "w-full flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl font-medium transition-colors";
+                    if(mobBtn) mobBtn.className = "flex flex-col items-center justify-center w-full text-slate-400 hover:text-kku-red";
+                }
+            });
+
+            if(viewName === 'map') {
+                setTimeout(() => {
+                    initKKUMap();
+                }, 250);
+            }
+        }
+
+        function initKKUMap() {
+            if (!mapInitialized) {
+                kkuMap = L.map('kku-leaflet-map').setView([16.4735, 102.8210], 15);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(kkuMap);
+
+                buildingsData.forEach(b => {
+                    const stats = getBuildingStats(b);
+                    const marker = L.marker([b.lat, b.lng]).addTo(kkuMap);
+                    marker.bindPopup(`
+                        <div style="font-family: Inter, sans-serif; padding: 4px;">
+                            <h4 style="font-weight: bold; font-size: 14px; color: #a51931; margin-bottom: 2px;">${b.name}</h4>
+                            <p style="font-size: 12px; color: #64748b; margin-bottom: 6px;">${b.desc}</p>
+                            <span style="background: #10b981; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold;">Available: ${stats.available} slots</span>
+                            <br><button onclick="openBuildingDetail('${b.id}')" style="margin-top: 8px; background: #a51931; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer;">View Parking</button>
+                        </div>
+                    `);
+                });
+                mapInitialized = true;
+            } else {
+                kkuMap.invalidateSize();
+            }
+        }
+
         function updateConnectionStatus(connected) {
             const statusDiv = document.getElementById('api-status');
             const statusDot = document.getElementById('api-status-dot');
             const statusText = document.getElementById('api-status-text');
 
-            isApiConnected = connected;
-
             if (connected) {
-                statusDiv.classList.replace('bg-slate-50', 'bg-emerald-50');
-                statusDiv.classList.replace('border-slate-200', 'border-emerald-200');
-                statusText.classList.replace('text-slate-500', 'text-emerald-700');
+                statusDiv.className = "flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-200 bg-emerald-50 text-xs font-medium text-emerald-700";
                 statusText.textContent = 'Camera Active';
-                statusDot.classList.replace('bg-slate-400', 'bg-emerald-500');
-                statusDot.classList.replace('bg-red-500', 'bg-emerald-500');
+                statusDot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
             } else {
-                statusDiv.classList.replace('bg-emerald-50', 'bg-red-50');
-                statusDiv.classList.replace('border-emerald-200', 'border-red-200');
-                statusText.classList.replace('text-emerald-700', 'text-red-700');
+                statusDiv.className = "flex items-center gap-2 px-3 py-1.5 rounded-full border border-red-200 bg-red-50 text-xs font-medium text-red-700";
                 statusText.textContent = 'Camera Offline';
-                statusDot.classList.replace('bg-emerald-500', 'bg-red-500');
+                statusDot.className = "w-2 h-2 rounded-full bg-red-500";
             }
         }
 
         function fetchLiveStatus() {
-            // เชื่อมต่อ Ngrok พร้อมใส่ Header ข้ามหน้าจอเตือนความปลอดภัย
             fetch(API_URL, {
                 method: 'GET',
-                headers: {
-                    "ngrok-skip-browser-warning": "true",
-                    "Content-Type": "application/json"
+                headers: { "ngrok-skip-browser-warning": "true", "Content-Type": "application/json" }
+            })
+            .then(response => { if (!response.ok) throw new Error('Error'); return response.json(); })
+            .then(data => {
+                updateConnectionStatus(true);
+                const buildingA = buildingsData.find(b => b.id === 'A');
+                if(buildingA) {
+                    for(let i = 0; i < 10; i++) {
+                        const slotKey = `A${i+1}`;
+                        if(data[slotKey] !== undefined) { buildingA.slots[i] = !data[slotKey]; }
+                    }
+                }
+                updateGlobalStats();
+                renderDashboard();
+                if (currentActiveBuilding && document.getElementById('view-detail').classList.contains('view-active')) {
+                    renderSlots();
+                    updateDetailStats();
                 }
             })
-                .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    return response.json();
-                })
-                .then(data => {
-                    updateConnectionStatus(true);
-                    
-                    const buildingA = buildingsData.find(b => b.id === 'A');
-                    if(buildingA) {
-                        for(let i = 0; i < 10; i++) {
-                            const slotKey = `A${i+1}`;
-                            if(data[slotKey] !== undefined) {
-                                buildingA.slots[i] = !data[slotKey]; 
-                            }
-                        }
-                    }
-
-                    updateGlobalStats();
-                    renderDashboard();
-                    
-                    if (currentActiveBuilding && document.getElementById('view-detail').classList.contains('view-active')) {
-                        renderSlots();
-                        updateDetailStats();
-                    }
-                })
-                .catch(error => {
-                    updateConnectionStatus(false);
-                });
+            .catch(() => updateConnectionStatus(false));
         }
 
         function startApiPolling() {
@@ -457,11 +394,8 @@
             let t = 0, a = 0, o = 0;
             buildingsData.forEach(b => {
                 const stats = getBuildingStats(b);
-                t += b.total;
-                a += stats.available;
-                o += stats.occupied;
+                t += b.total; a += stats.available; o += stats.occupied;
             });
-
             document.getElementById('global-total').textContent = t;
             document.getElementById('global-available').textContent = a;
             document.getElementById('global-occupied').textContent = o;
@@ -474,7 +408,6 @@
 
             buildingsData.forEach(b => {
                 const stats = getBuildingStats(b);
-                
                 const card = document.createElement('div');
                 card.className = 'bg-white p-6 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-kku-red/50 hover:shadow-md transition-all group';
                 card.onclick = () => openBuildingDetail(b.id);
@@ -489,23 +422,16 @@
                             <span class="text-lg font-bold text-slate-700 leading-none">${stats.available}</span>
                         </div>
                     </div>
-                    
                     <div class="mb-2 flex justify-between text-xs font-semibold">
                         <span class="text-slate-500">Capacity</span>
                         <span class="text-slate-800">${stats.percentage}% Free</span>
                     </div>
-                    
                     <div class="w-full h-2.5 bg-red-100 rounded-full flex overflow-hidden">
                         <div class="h-full bg-emerald-400 rounded-full transition-all duration-500" style="width: ${stats.percentage}%"></div>
                     </div>
-                    
                     <div class="mt-4 flex gap-4 text-xs">
-                        <div class="flex items-center text-emerald-600 font-medium">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>${stats.available} Open
-                        </div>
-                        <div class="flex items-center text-red-500 font-medium">
-                            <span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span>${stats.occupied} Full
-                        </div>
+                        <div class="flex items-center text-emerald-600 font-medium"><span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>${stats.available} Open</div>
+                        <div class="flex items-center text-red-500 font-medium"><span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span>${stats.occupied} Full</div>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -514,30 +440,22 @@
 
         function openBuildingDetail(buildingId) {
             currentActiveBuilding = buildingsData.find(b => b.id === buildingId);
-            
             document.getElementById('detail-building-name').textContent = currentActiveBuilding.name;
             document.getElementById('detail-building-desc').textContent = currentActiveBuilding.desc;
-            
             renderSlots();
             updateDetailStats();
 
-            document.getElementById('view-home').classList.replace('view-active', 'view-hidden');
-            document.getElementById('view-detail').classList.replace('view-hidden', 'view-active');
+            const views = ['home', 'map', 'detail'];
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if(el) el.className = (v === 'detail') ? 'view-container view-active h-full flex flex-col w-full absolute inset-0 overflow-y-auto bg-white' : 'view-container view-hidden h-full flex flex-col w-full absolute inset-0';
+            });
         }
 
         function navigateBack() {
             renderDashboard();
-            
-            document.getElementById('view-detail').classList.replace('view-active', 'view-hidden');
-            document.getElementById('view-home').classList.replace('view-hidden', 'view-active');
-            
+            switchView('home');
             currentActiveBuilding = null;
-        }
-
-        function navigateBackToHome() {
-            if (document.getElementById('view-detail').classList.contains('view-active')) {
-                navigateBack();
-            }
         }
 
         function updateDetailStats() {
@@ -550,39 +468,24 @@
         function toggleSlot(index) {
             if(!currentActiveBuilding) return;
             currentActiveBuilding.slots[index] = !currentActiveBuilding.slots[index];
-            
             renderSlots();
             updateDetailStats();
         }
 
         function renderSlots() {
             if(!currentActiveBuilding) return;
-
             const topRow = document.getElementById('slots-top');
             const bottomRow = document.getElementById('slots-bottom');
-            
-            topRow.innerHTML = '';
-            bottomRow.innerHTML = '';
+            topRow.innerHTML = ''; bottomRow.innerHTML = '';
 
             currentActiveBuilding.slots.forEach((isAvailable, index) => {
                 const slotNum = index + 1;
                 const isTopRow = index < 5;
-                
                 const slotDiv = document.createElement('div');
-                
                 let classes = 'parking-slot relative h-28 md:h-32 border-2 rounded-lg flex flex-col items-center justify-center cursor-pointer bg-white group ';
                 
-                if (isTopRow) {
-                    classes += 'border-b-0 rounded-b-none ';
-                } else {
-                    classes += 'border-t-0 rounded-t-none ';
-                }
-
-                if (isAvailable) {
-                    classes += 'border-emerald-400 hover:bg-emerald-50';
-                } else {
-                    classes += 'border-red-400 bg-red-50/50';
-                }
+                classes += isTopRow ? 'border-b-0 rounded-b-none ' : 'border-t-0 rounded-t-none ';
+                classes += isAvailable ? 'border-emerald-400 hover:bg-emerald-50' : 'border-red-400 bg-red-50/50';
 
                 slotDiv.className = classes;
                 slotDiv.onclick = () => toggleSlot(index);
@@ -591,26 +494,18 @@
                     `<div class="w-2.5 h-2.5 rounded-full bg-emerald-500 mb-2"></div>` : 
                     `<i class="fa-solid fa-car text-2xl md:text-3xl text-red-400 mb-2 ${isTopRow ? 'rotate-180' : ''}"></i>`;
 
-                const labelColor = isAvailable ? 'text-emerald-700' : 'text-red-700';
-
                 slotDiv.innerHTML = `
                     ${carVisual}
-                    <span class="text-xs md:text-sm font-bold ${labelColor} ${isTopRow ? '' : 'rotate-180'}">
+                    <span class="text-xs md:text-sm font-bold ${isAvailable ? 'text-emerald-700' : 'text-red-700'} ${isTopRow ? '' : 'rotate-180'}">
                         ${currentActiveBuilding.id}-${String(slotNum).padStart(2, '0')}
                     </span>
-                    
                     <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity ${isTopRow ? 'rounded-t-lg' : 'rounded-b-lg'}">
-                        <span class="text-white text-xs font-semibold px-2 text-center">
-                            Click to ${isAvailable ? 'Park' : 'Leave'}
-                        </span>
+                        <span class="text-white text-xs font-semibold px-2 text-center">Click to ${isAvailable ? 'Park' : 'Leave'}</span>
                     </div>
                 `;
 
-                if (isTopRow) {
-                    topRow.appendChild(slotDiv);
-                } else {
-                    bottomRow.appendChild(slotDiv);
-                }
+                if (isTopRow) topRow.appendChild(slotDiv);
+                else bottomRow.appendChild(slotDiv);
             });
         }
     </script>
