@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KKU Parking - Admin Portal</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -13,7 +12,7 @@
 </head>
 <body class="bg-slate-50 flex h-screen overflow-hidden">
 
-    <!-- Sidebar (แสดงบน Desktop และซ่อนเมื่อเป็นหน้าจอมือถือ) -->
+    <!-- Sidebar (แสดงบน Desktop และซ่อนบนมือถือ) -->
     <aside class="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col justify-between z-20">
         <div>
             <!-- Logo / Brand -->
@@ -88,14 +87,14 @@
             
             <!-- Real-time Capacity Cards -->
             <div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Real-Time Capacity</p>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">REAL-TIME CAPACITY</p>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <!-- Total Spaces -->
                     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
                         <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-bold text-lg">🚗</div>
                         <div>
                             <p class="text-xs text-slate-400 font-medium">Total Spaces</p>
-                            <h3 class="text-xl font-bold text-slate-800">5</h3>
+                            <h3 class="text-xl font-bold text-slate-800">50</h3>
                         </div>
                     </div>
                     <!-- Available Spaces -->
@@ -117,22 +116,142 @@
                 </div>
             </div>
 
-            <!-- Managed Facilities (Zone Cards) -->
+            <!-- Managed Facilities (Zone Cards ตามดีไซน์เดิม) -->
             <div>
                 <div class="flex justify-between items-center mb-3">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Managed Facilities</p>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">MANAGED FACILITIES</p>
                     <span class="text-xs text-rose-600 font-semibold cursor-pointer hover:underline">Refresh 🔄</span>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="slotsContainer">
-                    <!-- โค้ดจะถูกสร้างด้วย JavaScript อัตโนมัติสำหรับ Zone A1 - A5 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    
+                    <!-- Building A (เชื่อมกับ A1) -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-base">Building A</h4>
+                                <p class="text-xs text-slate-400">Engineer building</p>
+                            </div>
+                            <span id="badge-A1" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600">Loading</span>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs text-slate-500 mb-1">
+                                <span>Capacity</span>
+                                <span id="percent-A1">100% Free</span>
+                            </div>
+                            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                <div id="bar-A1" class="bg-emerald-500 h-full w-full transition-all duration-300"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-500 pt-1">
+                            <span id="open-A1">🟢 1 Open</span>
+                            <span id="full-A1">🔴 0 Full</span>
+                        </div>
+                    </div>
+
+                    <!-- Building B (เชื่อมกับ A2) -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-base">Building B</h4>
+                                <p class="text-xs text-slate-400">Science building</p>
+                            </div>
+                            <span id="badge-A2" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600">Loading</span>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs text-slate-500 mb-1">
+                                <span>Capacity</span>
+                                <span id="percent-A2">100% Free</span>
+                            </div>
+                            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                <div id="bar-A2" class="bg-emerald-500 h-full w-full transition-all duration-300"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-500 pt-1">
+                            <span id="open-A2">🟢 1 Open</span>
+                            <span id="full-A2">🔴 0 Full</span>
+                        </div>
+                    </div>
+
+                    <!-- Building C (เชื่อมกับ A3) -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-base">Building C</h4>
+                                <p class="text-xs text-slate-400">Business building</p>
+                            </div>
+                            <span id="badge-A3" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600">Loading</span>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs text-slate-500 mb-1">
+                                <span>Capacity</span>
+                                <span id="percent-A3">100% Free</span>
+                            </div>
+                            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                <div id="bar-A3" class="bg-emerald-500 h-full w-full transition-all duration-300"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-500 pt-1">
+                            <span id="open-A3">🟢 1 Open</span>
+                            <span id="full-A3">🔴 0 Full</span>
+                        </div>
+                    </div>
+
+                    <!-- Building D (เชื่อมกับ A4) -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-base">Building D</h4>
+                                <p class="text-xs text-slate-400">Humanity building</p>
+                            </div>
+                            <span id="badge-A4" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600">Loading</span>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs text-slate-500 mb-1">
+                                <span>Capacity</span>
+                                <span id="percent-A4">100% Free</span>
+                            </div>
+                            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                <div id="bar-A4" class="bg-emerald-500 h-full w-full transition-all duration-300"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-500 pt-1">
+                            <span id="open-A4">🟢 1 Open</span>
+                            <span id="full-A4">🔴 0 Full</span>
+                        </div>
+                    </div>
+
+                    <!-- Building E (เชื่อมกับ A5) -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-base">Building E</h4>
+                                <p class="text-xs text-slate-400">Library building</p>
+                            </div>
+                            <span id="badge-A5" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600">Loading</span>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs text-slate-500 mb-1">
+                                <span>Capacity</span>
+                                <span id="percent-A5">100% Free</span>
+                            </div>
+                            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                <div id="bar-A5" class="bg-emerald-500 h-full w-full transition-all duration-300"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-500 pt-1">
+                            <span id="open-A5">🟢 1 Open</span>
+                            <span id="full-A5">🔴 0 Full</span>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
         </div>
     </main>
 
-    <!-- 📱 Bottom Navigation Bar (แสดงเฉพาะบนมือถือ ดีไซน์สวยงามทันสมัย) -->
+    <!-- 📱 Bottom Navigation Bar (แสดงเฉพาะบนมือถือ) -->
     <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-md border-t border-slate-200 shadow-[0_-10px_25px_rgba(0,0,0,0.05)] rounded-t-2xl z-50">
         <div class="flex justify-around items-center h-20 px-2">
             <a href="#" class="flex flex-col items-center justify-center w-full text-rose-700">
@@ -154,48 +273,18 @@
         </div>
     </nav>
 
-    <!-- JavaScript สำหรับดึงข้อมูลและอัปเดตสถานะ -->
+    <!-- JavaScript สำหรับดึงข้อมูลและอัปเดตหน้าจอ -->
     <script>
-        // ==========================================
-        // 🔴 ใส่ลิงก์ Ngrok ของคุณตรงนี้ (ต้องมี /api/status ต่อท้าย)
-        // ==========================================
+        // ลิงก์ Ngrok ที่อัปเดตให้เรียบร้อยแล้ว
         const API_URL = "https://anthill-husband-unwatched.ngrok-free.dev/api/status";
 
-        const slots = ["A1", "A2", "A3", "A4", "A5"];
-        const container = document.getElementById('slotsContainer');
         const badge = document.getElementById('statusBadge');
         const dot = document.getElementById('statusDot');
         const text = document.getElementById('statusText');
 
-        // สร้าง Card แสดงสถานะช่องจอดรถแบบดั้งเดิม
-        slots.forEach(slot => {
-            const card = document.createElement('div');
-            card.className = "bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4";
-            card.innerHTML = `
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h4 class="font-bold text-slate-800 text-base">Building ${slot}</h4>
-                        <p class="text-xs text-slate-400">Smart Parking Slot</p>
-                    </div>
-                    <span id="badge-${slot}" class="text-xs font-bold px-2.5 py-1 rounded-md bg-slate-100 text-slate-400">Loading</span>
-                </div>
-                <div>
-                    <div class="flex justify-between text-xs text-slate-500 mb-1">
-                        <span>Capacity</span>
-                        <span id="text-percent-${slot}">100% Free</span>
-                    </div>
-                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                        <div id="bar-${slot}" class="bg-emerald-500 h-full w-full transition-all duration-300"></div>
-                    </div>
-                </div>
-            `;
-            container.appendChild(card);
-        });
-
-        // ฟังก์ชันดึงข้อมูลจาก Backend ผ่าน Ngrok
+        // ฟังก์ชันดึงข้อมูลจาก Python ผ่าน Ngrok
         async function fetchParkingStatus() {
             try {
-                // ส่ง Header เพื่อข้ามหน้าเตือนความปลอดภัยของ Ngrok (แก้ปัญหา CORS)
                 const response = await fetch(API_URL, {
                     method: 'GET',
                     headers: {
@@ -215,32 +304,40 @@
             }
         }
 
-        // ฟังก์ชันอัปเดตหน้าจอตามข้อมูลที่ได้จาก AI
+        // ฟังก์ชันอัปเดตหน้าจอตามข้อมูลที่ได้จาก Python (A1 ถึง A5)
         function updateUI(data) {
             let occupiedCount = 0;
+            const slots = ["A1", "A2", "A3", "A4", "A5"];
 
-            for (const [slot, isOccupied] of Object.entries(data)) {
+            slots.forEach(slot => {
+                const isOccupied = data[slot];
                 const badgeEl = document.getElementById(`badge-${slot}`);
                 const barEl = document.getElementById(`bar-${slot}`);
-                const percentEl = document.getElementById(`text-percent-${slot}`);
+                const percentEl = document.getElementById(`percent-${slot}`);
+                const openEl = document.getElementById(`open-${slot}`);
+                const fullEl = document.getElementById(`full-${slot}`);
 
                 if (isOccupied) {
                     occupiedCount++;
-                    badgeEl.textContent = "1 Occupied";
-                    badgeEl.className = "text-xs font-bold px-2.5 py-1 rounded-md bg-rose-50 text-rose-600 border border-rose-100";
+                    badgeEl.textContent = "1 Full";
+                    badgeEl.className = "text-xs font-bold px-2.5 py-1 rounded-lg bg-rose-50 text-rose-600 border border-rose-100";
                     barEl.className = "bg-rose-500 h-full w-full transition-all duration-300";
-                    percentEl.textContent = "Occupied";
+                    percentEl.textContent = "0% Free";
+                    openEl.textContent = "🟢 0 Open";
+                    fullEl.textContent = "🔴 1 Full";
                 } else {
                     badgeEl.textContent = "1 Open";
-                    badgeEl.className = "text-xs font-bold px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100";
+                    badgeEl.className = "text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100";
                     barEl.className = "bg-emerald-500 h-full w-full transition-all duration-300";
                     percentEl.textContent = "100% Free";
+                    openEl.textContent = "🟢 1 Open";
+                    fullEl.textContent = "🔴 0 Full";
                 }
-            }
+            });
 
-            // อัปเดตตัวเลขรวมด้านบน
-            document.getElementById('countAvailable').textContent = 5 - occupiedCount;
-            document.getElementById('countOccupied').textContent = occupiedCount;
+            const availableCount = 5 - occupiedCount;
+            document.getElementById('countAvailable').textContent = availableCount * 10;
+            document.getElementById('countOccupied').textContent = occupiedCount * 10;
         }
 
         // เปลี่ยนสถานะมุมขวาบนเมื่อเชื่อมต่อสำเร็จ
