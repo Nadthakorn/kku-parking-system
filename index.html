@@ -110,6 +110,9 @@
         .text-primary-theme { color: var(--primary-text); }
         .bg-primary-light { background-color: var(--primary-light); color: var(--primary-text); }
 
+        select::-ms-expand { display: none; }
+        select:focus { outline: none; }
+
         #splash-screen {
             transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -118,20 +121,21 @@
             visibility: hidden;
         }
 
-        /* Lightning-fast professional view transitions with zero ghost/overlap artifacts */
+        /* Perfectly optimized view transitions eliminating ghosting/overlap artifacts */
         .view-container {
             display: none;
             opacity: 0;
-            transform: translateY(6px);
-            transition: opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(4px);
+            transition: opacity 0.14s cubic-bezier(0.16, 1, 0.3, 1), transform 0.14s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
         }
         .view-active {
             display: flex !important;
             opacity: 1;
             transform: translateY(0);
+            pointer-events: auto;
         }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg-canvas); }
         ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
@@ -155,7 +159,6 @@
 </head>
 <body class="antialiased h-screen overflow-hidden flex selection:bg-rose-500 selection:text-white">
 
-    <!-- Splash Screen -->
     <div id="splash-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center" style="background-color: var(--bg-card);">
         <div class="w-32 h-32 subtle-surface border border-theme rounded-3xl flex items-center justify-center mb-6 shadow-xl animate-pulse">
             <i class="fa-solid fa-car text-5xl text-primary-theme" id="splash-icon"></i>
@@ -164,7 +167,6 @@
         <p class="text-muted mt-2 text-xs font-semibold uppercase tracking-widest">Enterprise Management System</p>
     </div>
 
-    <!-- Desktop Sidebar -->
     <aside id="sidebar-container" class="w-64 card-surface border-r border-theme h-full hidden md:flex flex-col z-30 fixed left-0 top-0 shadow-lg">
         <div class="h-20 flex items-center px-6 border-b border-theme">
             <div class="w-10 h-10 rounded-xl bg-primary-light flex items-center justify-center mr-3 font-bold text-lg">
@@ -202,7 +204,6 @@
         </div>
     </aside>
 
-    <!-- Main Content Area -->
     <main class="flex-1 h-full flex flex-col relative app-bg md:ml-64 pb-20 md:pb-0">
         
         <!-- 1. HOME VIEW (Dashboard) -->
@@ -315,9 +316,43 @@
                 </div>
 
                 <div class="card-surface rounded-3xl border border-theme shadow-sm overflow-hidden">
-                    <div class="p-6 border-b border-theme flex justify-between items-center">
-                        <h3 class="font-bold text-main text-sm uppercase tracking-wider" data-i18n="recent_activities">Recent Activity Logs</h3>
-                        <span class="text-xs text-muted font-semibold">Showing latest events</span>
+                    <div class="p-6 border-b border-theme flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h3 class="font-bold text-main text-sm uppercase tracking-wider" data-i18n="recent_activities">Recent Activity Logs</h3>
+                            <span class="text-xs text-muted font-semibold">Filter and inspect event history</span>
+                        </div>
+                        <!-- History Filtering Controls -->
+                        <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+                            <div class="relative flex-1 sm:w-56">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-muted text-xs"></i>
+                                <input type="text" id="history-search" oninput="app.parkingManager.filterLogs()" placeholder="Search logs..." class="w-full pl-9 pr-3 py-2 subtle-surface border border-theme rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 text-main" data-i18n-placeholder="history_search_placeholder">
+                            </div>
+                            <div class="relative">
+                                <select id="history-filter-building" onchange="app.parkingManager.filterLogs()" class="px-3 pr-8 py-2 subtle-surface border border-theme rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30 text-main cursor-pointer appearance-none shadow-sm">
+                                    <option value="all" data-i18n="filter_all_buildings">All Buildings</option>
+                                    <option value="Building A">Building A</option>
+                                    <option value="Building B">Building B</option>
+                                    <option value="Building C">Building C</option>
+                                    <option value="Building D">Building D</option>
+                                    <option value="Building E">Building E</option>
+                                    <option value="Building F">Building F</option>
+                                    <option value="Building G">Building G</option>
+                                </select>
+                                <div class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-muted">
+                                    <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <select id="history-filter-status" onchange="app.parkingManager.filterLogs()" class="px-3 pr-8 py-2 subtle-surface border border-theme rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30 text-main cursor-pointer appearance-none shadow-sm">
+                                    <option value="all" data-i18n="filter_all_status">All Status</option>
+                                    <option value="Available">Available</option>
+                                    <option value="Occupied">Occupied</option>
+                                </select>
+                                <div class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-muted">
+                                    <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
@@ -364,7 +399,6 @@
                         <h4 class="font-bold text-sm text-main uppercase tracking-wider" data-i18n="settings_header">System Customization & Settings</h4>
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                            <!-- Custom Styled Language Select Wrapper -->
                             <div>
                                 <label class="block text-xs font-bold text-muted mb-2 uppercase tracking-wide" data-i18n="lang_label">Language / ภาษา</label>
                                 <div class="relative">
@@ -377,7 +411,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- Custom Styled Theme Select Wrapper -->
                             <div>
                                 <label class="block text-xs font-bold text-muted mb-2 uppercase tracking-wide" data-i18n="theme_label">Color Theme / ธีมสี</label>
                                 <div class="relative">
@@ -463,7 +496,6 @@
         </div>
     </main>
 
-    <!-- Mobile Bottom Navigation -->
     <nav class="md:hidden fixed bottom-0 left-0 w-full card-surface backdrop-blur-xl border-t border-theme shadow-2xl rounded-t-3xl z-40">
         <div class="flex justify-around items-center h-20 px-2">
             <button onclick="app.switchView('home')" id="mob-home" class="mob-btn flex flex-col items-center justify-center w-full text-muted py-2 transition-all">
@@ -482,9 +514,6 @@
     </nav>
 
     <script>
-        /**
-         * Custom Toast Notification (replaces native alert)
-         */
         function showToast(message, type = 'success') {
             const existing = document.getElementById('custom-toast');
             if (existing) existing.remove();
@@ -507,9 +536,6 @@
             }, 3000);
         }
 
-        /**
-         * ThemeManager Class: Manages KKU Red, Ocean Blue, and True Dark Mode with CSS variables.
-         */
         class ThemeManager {
             constructor() {
                 this.currentTheme = localStorage.getItem('kku_theme') || 'red';
@@ -541,9 +567,6 @@
             }
         }
 
-        /**
-         * LanguageManager Class: Handles multi-language internationalization (EN/TH).
-         */
         class LanguageManager {
             constructor() {
                 this.currentLang = localStorage.getItem('kku_lang') || 'en';
@@ -557,12 +580,13 @@
                         clear_logs_btn: "Clear Logs", highest_occupancy: "Highest Occupancy Zone", peak_demand: "Peak parking demand detected",
                         traffic_bars: "Building Traffic & Occupancy Bars", recent_activities: "Recent Activity Logs",
                         th_time: "Timestamp", th_building: "Building / Zone", th_slot: "Slot ID", th_status: "Status Event", th_source: "Detection Source",
-                        no_logs: "No activity logs recorded yet.", profile_title: "System Profile & Settings", owner_badge: "System Owner",
+                        no_logs: "No activity logs recorded matching criteria.", profile_title: "System Profile & Settings", owner_badge: "System Owner",
                         settings_header: "System Customization & Settings", lang_label: "Language / ภาษา", theme_label: "Color Theme / ธีมสี",
                         edit_profile: "Edit Profile Information", name_label: "Full Name", email_label: "Email Address", upload_label: "Upload Profile Image",
                         save_btn: "Save Changes", nav_button: "Navigate", detail_available: "Available", detail_occupied: "Occupied",
                         floor_plan: "Ground Floor Plan", floor_sub: "Click a slot to toggle its status manually for testing.", live_sensors: "Live Sensors Active",
-                        legend_title: "Map Legend", legend_building: "Parking Building", legend_avail: "Available Spaces", legend_nav: "Click Pin to View"
+                        legend_title: "Map Legend", legend_building: "Parking Building", legend_avail: "Available Spaces", legend_nav: "Click Pin to View",
+                        history_search_placeholder: "Search logs...", filter_all_buildings: "All Buildings", filter_all_status: "All Status"
                     },
                     th: {
                         menu_dashboard: "หน้าหลัก", menu_map: "แผนที่มข.", menu_history: "ประวัติการทำงาน", menu_profile: "ตั้งค่าโปรไฟล์",
@@ -573,12 +597,13 @@
                         clear_logs_btn: "ล้างประวัติ", highest_occupancy: "โซนที่มีรถจอดหนาแน่นที่สุด", peak_demand: "ตรวจพบความต้องการจอดรถสูงสุด",
                         traffic_bars: "กราฟแสดงอัตราความหนาแน่นรายอาคาร", recent_activities: "บันทึกเหตุการณ์ล่าสุด",
                         th_time: "เวลา", th_building: "อาคาร / โซน", th_slot: "หมายเลขช่อง", th_status: "สถานะ", th_source: "แหล่งที่มา",
-                        no_logs: "ยังไม่มีประวัติบันทึกการใช้งานในระบบ", profile_title: "โปรไฟล์ระบบและการตั้งค่า", owner_badge: "ผู้ดูแลระบบสูงสุด",
+                        no_logs: "ไม่พบประวัติการใช้งานที่ตรงกับเงื่อนไข", profile_title: "โปรไฟล์ระบบและการตั้งค่า", owner_badge: "ผู้ดูแลระบบสูงสุด",
                         settings_header: "การปรับแต่งระบบและตั้งค่า", lang_label: "ภาษา / Language", theme_label: "ธีมสี / Color Theme",
                         edit_profile: "แก้ไขข้อมูลส่วนตัว", name_label: "ชื่อ - นามสกุล", email_label: "อีเมล", upload_label: "อัปโหลดรูปโปรไฟล์",
                         save_btn: "บันทึกการเปลี่ยนแปลง", nav_button: "นำทาง", detail_available: "ว่าง", detail_occupied: "ไม่ว่าง",
                         floor_plan: "แผนผังชั้นล่าง (Ground Floor)", floor_sub: "คลิกที่ช่องจอดเพื่อเปลี่ยนสถานะจำลองการทดสอบ", live_sensors: "เซนเซอร์กล้องทำงานปกติ",
-                        legend_title: "สัญลักษณ์บนแผนที่", legend_building: "อาคารจอดรถ", legend_avail: "ช่องจอดว่าง", legend_nav: "แตะพินเพื่อดูข้อมูล"
+                        legend_title: "สัญลักษณ์บนแผนที่", legend_building: "อาคารจอดรถ", legend_avail: "ช่องจอดว่าง", legend_nav: "แตะพินเพื่อดูข้อมูล",
+                        history_search_placeholder: "ค้นหาประวัติ...", filter_all_buildings: "อาคารทั้งหมด", filter_all_status: "สถานะทั้งหมด"
                     }
                 };
             }
@@ -613,9 +638,6 @@
             }
         }
 
-        /**
-         * ProfileManager Class: Manages administrator profile data, initials, and image uploads.
-         */
         class ProfileManager {
             constructor() {
                 this.profile = {
@@ -687,9 +709,6 @@
             }
         }
 
-        /**
-         * ParkingManager Class: Manages building slots, analytics, logs, and backend polling.
-         */
         class ParkingManager {
             constructor() {
                 this.buildings = [
@@ -798,20 +817,38 @@
                 this.renderHistoryTable();
             }
 
+            filterLogs() {
+                this.renderHistoryTable();
+            }
+
             renderHistoryTable() {
                 const tbody = document.getElementById('history-table-body');
                 const emptyEl = document.getElementById('history-empty');
                 if (!tbody) return;
                 tbody.innerHTML = '';
 
-                if (this.historyLogs.length === 0) {
+                const searchTerm = document.getElementById('history-search')?.value.toLowerCase() || '';
+                const buildingFilter = document.getElementById('history-filter-building')?.value || 'all';
+                const statusFilter = document.getElementById('history-filter-status')?.value || 'all';
+
+                const filteredLogs = this.historyLogs.filter(log => {
+                    const matchesSearch = log.building.toLowerCase().includes(searchTerm) ||
+                                          log.slot.toLowerCase().includes(searchTerm) ||
+                                          log.source.toLowerCase().includes(searchTerm) ||
+                                          log.time.toLowerCase().includes(searchTerm);
+                    const matchesBuilding = buildingFilter === 'all' || log.building === buildingFilter || (buildingFilter === 'System Initialization' && log.building.includes('System'));
+                    const matchesStatus = statusFilter === 'all' || log.status === statusFilter;
+                    return matchesSearch && matchesBuilding && matchesStatus;
+                });
+
+                if (filteredLogs.length === 0) {
                     if (emptyEl) emptyEl.classList.remove('hidden');
                     return;
                 } else {
                     if (emptyEl) emptyEl.classList.add('hidden');
                 }
 
-                this.historyLogs.forEach(log => {
+                filteredLogs.forEach(log => {
                     const tr = document.createElement('tr');
                     tr.className = "subtle-surface transition-colors hover:opacity-90";
                     const badgeColor = log.status === 'Available' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20';
@@ -892,9 +929,6 @@
             }
         }
 
-        /**
-         * MapManager Class: Manages Leaflet Map integration and custom markers.
-         */
         class MapManager {
             constructor() {
                 this.map = null;
@@ -938,9 +972,6 @@
             }
         }
 
-        /**
-         * AppController Class: Central coordinator for all views and state transitions.
-         */
         class AppController {
             constructor() {
                 this.themeManager = new ThemeManager();
@@ -951,16 +982,13 @@
             }
 
             init() {
-                // Initialize theme, language, profile, parking first
                 this.themeManager.init();
                 this.languageManager.init();
                 this.profileManager.init();
                 this.parkingManager.init();
 
-                // Explicitly set default view to home/dashboard immediately
                 this.switchView('home');
 
-                // Fade out splash screen after a short professional delay
                 setTimeout(() => {
                     const splash = document.getElementById('splash-screen');
                     if (splash) {
@@ -971,14 +999,20 @@
             }
 
             switchView(viewName) {
-                ['home', 'map', 'history', 'profile', 'detail'].forEach(v => {
+                const views = ['home', 'map', 'history', 'profile', 'detail'];
+                
+                // Immediately synchronize view activation with requestAnimationFrame to prevent reflow stutter and ghosting artifacts
+                views.forEach(v => {
                     const el = document.getElementById(`view-${v}`);
                     if (el) {
                         if (v === viewName) {
-                            el.classList.add('view-active');
-                            void el.offsetWidth; // Force reflow
+                            el.style.display = 'flex';
+                            requestAnimationFrame(() => {
+                                el.classList.add('view-active');
+                            });
                         } else {
                             el.classList.remove('view-active');
+                            el.style.display = 'none';
                         }
                     }
                 });
@@ -996,7 +1030,7 @@
                 });
 
                 if (viewName === 'map') {
-                    setTimeout(() => this.mapManager.init(), 100);
+                    setTimeout(() => this.mapManager.init(), 50);
                 }
                 if (viewName === 'history') {
                     this.parkingManager.updateAnalytics();
@@ -1073,7 +1107,6 @@
             }
         }
 
-        // Initialize Application
         const app = new AppController();
         document.addEventListener('DOMContentLoaded', () => app.init());
     </script>
